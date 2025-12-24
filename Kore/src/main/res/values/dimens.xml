@@ -1,0 +1,3 @@
+<resources>
+    <dimen name="generic_panel_padding">16dp</dimen>
+</resources>

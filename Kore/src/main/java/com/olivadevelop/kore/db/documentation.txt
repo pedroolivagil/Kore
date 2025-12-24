@@ -1,0 +1,99 @@
+////////////////////////////////////////////////////////////////////////////////////////////////////
+// impl example
+/////////////////
+@Database(
+    entities = {
+        ProjectEntity.class,
+        DesignEntity.class,
+        StockEntity.class
+    },
+    version = 1,
+    exportSchema = false
+)
+@TypeConverters({Converters.class})
+public abstract class CrochetDB extends RoomDatabase implements IBaseDB {
+
+    private static volatile CrochetDB INSTANCE;
+
+    public abstract ProjectDao projectDao();
+    public abstract DesignDao designDao();
+    public abstract StockDao stockDao();
+
+    public static CrochetDB getInstance(Context context) {
+        if (INSTANCE == null) {
+            synchronized (CrochetDB.class) {
+                if (INSTANCE == null) {
+                    INSTANCE = Room.databaseBuilder(
+                            context.getApplicationContext(),
+                            CrochetDB.class,
+                            "crochet.db"
+                    ).fallbackToDestructiveMigration().build();
+                }
+            }
+        }
+        return INSTANCE;
+    }
+}
+
+public class CrochetDBProvider implements DataBaseProvider {
+    @Override
+    public IBaseDB provide(Context context) {
+        return CrochetDB.getInstance(context);
+    }
+}
+
+public final class CrochetCore {
+
+    private static IBaseFactory factory;
+
+    private CrochetCore() {}
+
+    public static synchronized void init(Context context) {
+        if (factory == null) {
+            IBaseFactoryProvider provider = new BaseFactoryProvider();
+            factory = provider.create(
+                context,
+                new CrochetDBProvider()
+            );
+        }
+    }
+
+    public static IBaseFactory factory() {
+        if (factory == null) {
+            throw new IllegalStateException("CrochetCore not initialized");
+        }
+        return factory;
+    }
+}
+
+
+////////////////
+// how to use //
+////////////////
+
+public class CrochetApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        CrochetCore.init(this);
+    }
+}
+
+CrochetCore.factory().execute(db -> {
+    CrochetDB crochetDB = (CrochetDB) db;
+    crochetDB.projectDao().insert(project);
+});
+
+CrochetCore.factory().executeListOnUI(db -> {
+    CrochetDB crochetDB = (CrochetDB) db;
+    return crochetDB.projectDao().getAll();
+}, projects -> {
+    adapter.submitList(projects);
+});
+
+CrochetCore.factory().executeLiveList(db -> {
+    CrochetDB crochetDB = (CrochetDB) db;
+    return crochetDB.projectDao().observeAll();
+}, liveData -> {
+    liveData.observe(this, adapter::submitList);
+});
