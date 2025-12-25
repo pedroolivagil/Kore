@@ -3,11 +3,11 @@ package com.olivadevelop.kore.db;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public interface IDataBaseFactory {
-    <T> void execute(ExecutionMode mode, Function<IDataBase, T> db, ResultSetCallback<T> callback);
-    void execute(ExecutionMode mode, Consumer<IDataBase> db, VoidCallback callback);
-    <T> void executeOnUI(Function<IDataBase, T> db, ResultSetCallback<T> callback);
-    void executeOnUI(Consumer<IDataBase> db, VoidCallback callback);
+public interface IDataBaseFactory<DB> {
+    <T> void execute(ExecutionMode mode, Function<DB, T> db, ResultSetCallback<T> callback);
+    void execute(ExecutionMode mode, Consumer<DB> db, VoidCallback callback);
+    <T> void executeOnUI(Function<DB, T> db, ResultSetCallback<T> callback);
+    void executeOnUI(Consumer<DB> db, VoidCallback callback);
     interface VoidCallback {
         void onComplete();
     }

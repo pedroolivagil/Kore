@@ -1,28 +1,32 @@
 package com.olivadevelop.kore.db.factory;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.olivadevelop.kore.db.IDataBase;
+import androidx.room.Room;
+import androidx.room.RoomDatabase;
+
 import com.olivadevelop.kore.db.IDataBaseFactory;
-import com.olivadevelop.kore.db.provider.IDataBaseProvider;
+import com.olivadevelop.kore.db.database.DataBaseConfig;
+import com.olivadevelop.kore.db.database.KoreDataBase;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-abstract class DataBaseFactory implements IDataBaseFactory {
-    private final IDataBase db;
+abstract class DataBaseFactory<DB extends KoreDataBase> implements IDataBaseFactory<DB> {
+    private final DB db;
     private final ExecutorService executorService;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
-    DataBaseFactory(Context context, IDataBaseProvider provider) {
-        this.db = provider.provide(context);
+    DataBaseFactory(DataBaseConfig<DB> config, Function<RoomDatabase.Builder<DB>, RoomDatabase.Builder<DB>> builder) {
+        RoomDatabase.Builder<DB> roomBuilder = Room.databaseBuilder(config.getContext(), config.getDbClass(), config.getDbName());
+        if (builder != null) { roomBuilder = builder.apply(roomBuilder); }
+        this.db = roomBuilder.build();
         this.executorService = Executors.newSingleThreadExecutor();
     }
     @Override
-    public <T> void execute(ExecutionMode mode, Function<IDataBase, T> action, ResultSetCallback<T> callback) {
+    public <T> void execute(ExecutionMode mode, Function<DB, T> action, ResultSetCallback<T> callback) {
         executorService.execute(() -> {
             T result = action.apply(db);
             if (mode == ExecutionMode.UI) {
@@ -33,7 +37,7 @@ abstract class DataBaseFactory implements IDataBaseFactory {
         });
     }
     @Override
-    public void execute(ExecutionMode mode, Consumer<IDataBase> db, VoidCallback callback) {
+    public void execute(ExecutionMode mode, Consumer<DB> db, VoidCallback callback) {
         executorService.execute(() -> {
             db.accept(this.db);
             if (mode == ExecutionMode.UI) {
@@ -44,7 +48,7 @@ abstract class DataBaseFactory implements IDataBaseFactory {
         });
     }
     @Override
-    public <T> void executeOnUI(Function<IDataBase, T> db, ResultSetCallback<T> callback) { execute(ExecutionMode.UI, db, callback); }
+    public <T> void executeOnUI(Function<DB, T> db, ResultSetCallback<T> callback) { execute(ExecutionMode.UI, db, callback); }
     @Override
-    public void executeOnUI(Consumer<IDataBase> db, VoidCallback callback) { execute(ExecutionMode.UI, db, callback); }
+    public void executeOnUI(Consumer<DB> db, VoidCallback callback) { execute(ExecutionMode.UI, db, callback); }
 }
