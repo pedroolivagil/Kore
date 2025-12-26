@@ -7,4 +7,4 @@ import lombok.Setter;
 @RequiredArgsConstructor
 @Setter
 @Getter
-public class VoidEntity implements CustomEntity { }
+public class VoidEntity implements KoreEntity { }

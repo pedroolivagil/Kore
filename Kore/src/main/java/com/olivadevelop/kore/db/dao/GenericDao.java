@@ -5,11 +5,11 @@ import androidx.room.Insert;
 import androidx.room.Transaction;
 import androidx.room.Update;
 
-import com.olivadevelop.kore.db.entity.CustomEntity;
+import com.olivadevelop.kore.db.entity.KoreEntity;
 
 import java.util.List;
 
-public interface GenericDao<T extends CustomEntity, K> {
+public interface GenericDao<T extends KoreEntity, K> {
     @Insert
     @Transaction
     K persist(T entity);

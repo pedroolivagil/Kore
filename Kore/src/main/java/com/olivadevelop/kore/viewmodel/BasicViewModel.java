@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.olivadevelop.kore.Constants;
 import com.olivadevelop.kore.component.BasicComponentView;
-import com.olivadevelop.kore.db.entity.CustomEntity;
+import com.olivadevelop.kore.db.entity.KoreEntity;
 import com.olivadevelop.kore.error.InvalidPropertyErrorVM;
 import com.olivadevelop.kore.nav.Navigation;
 import com.olivadevelop.kore.util.Utils;
@@ -29,7 +29,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public abstract class BasicViewModel<T extends CustomEntity> extends ViewModel implements Cloneable {
+public abstract class BasicViewModel<T extends KoreEntity> extends ViewModel implements Cloneable {
     private final MutableLiveData<Navigation.NavigationScreen> screenBack = new MutableLiveData<>(null);
 
     private Context ctx;
