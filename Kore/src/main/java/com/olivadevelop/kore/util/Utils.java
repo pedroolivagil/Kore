@@ -47,6 +47,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -376,7 +378,14 @@ public abstract class Utils {
         private static final Map<String, Method> methodCache = new HashMap<>();
         public static <T> Class<T> getClassTypeArgument(Object obj) { return getClassTypeArgument(obj, 0); }
         public static <T> Class<T> getClassTypeArgument(Object obj, int indexParam) {
-            return (Class<T>) ((java.lang.reflect.ParameterizedType) Objects.requireNonNull(obj.getClass().getGenericSuperclass())).getActualTypeArguments()[indexParam];
+            Type type = obj.getClass().getGenericSuperclass();
+            Class<T> objClass = null;
+            if (type instanceof Class) {
+                objClass = (Class<T>) ((ParameterizedType) Objects.requireNonNull(((Class<?>) obj.getClass().getGenericSuperclass()).getGenericSuperclass())).getActualTypeArguments()[indexParam];
+            } else if (type instanceof ParameterizedType) {
+                objClass = (Class<T>) ((ParameterizedType) type).getActualTypeArguments()[indexParam];
+            }
+            return objClass;
         }
         public static <T extends ViewBinding> T initBinding(Activity ctx) { return initBinding(ctx, 0); }
         public static <T extends ViewBinding> T initBinding(Activity ctx, int indexParam) {
