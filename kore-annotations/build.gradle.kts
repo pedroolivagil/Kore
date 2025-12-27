@@ -10,7 +10,10 @@ java {
 publishing {
     publications {
         register<MavenPublication>("release") {
-            version = "1.0.13"
+            artifactId = "kore-annotations"
+            version = "1.0.14"
+
+            from(components["java"])
         }
     }
 }

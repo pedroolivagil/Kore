@@ -73,7 +73,12 @@ dependencies {
 publishing {
     publications {
         register<MavenPublication>("release") {
-            version = "1.0.13"
+            artifactId = "kore"
+            version = "1.0.14"
+
+            afterEvaluate {
+                from(components["release"])
+            }
         }
     }
 }
