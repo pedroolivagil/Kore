@@ -3,7 +3,6 @@ plugins {
     id("maven-publish")
 }
 java {
-    withSourcesJar()
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
 }
@@ -16,9 +15,7 @@ dependencies {
 publishing {
     publications {
         register<MavenPublication>("release") {
-            groupId = "com.github.pedroolivagil"
-            artifactId = "kore-processor"
-            version = "1.0.12"
+            version = "1.0.13"
         }
     }
 }
