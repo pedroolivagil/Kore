@@ -8,6 +8,7 @@ java {
 }
 dependencies {
     implementation(project(":kore-annotations"))
+    implementation("com.google.auto.service:auto-service-annotations:1.1.1")
     implementation("com.google.auto.service:auto-service:1.1.1")
     annotationProcessor("com.google.auto.service:auto-service:1.1.1")
 }
@@ -16,7 +17,7 @@ publishing {
     publications {
         register<MavenPublication>("release") {
             artifactId = "kore-processor"
-            version = "1.0.15"
+            version = "1.0.16"
 
             from(components["java"])
         }

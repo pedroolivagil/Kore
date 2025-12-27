@@ -12,7 +12,6 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
@@ -21,26 +20,33 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
+import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
 @AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
-@SupportedAnnotationTypes("kore.annotations.GenerateDto")
 public class DtoGeneratorProcessor extends AbstractProcessor {
 
     private Filer filer;
     private Elements elements;
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        return Set.of(GenerateDto.class.getCanonicalName());
+    }
 
     @Override
     public synchronized void init(ProcessingEnvironment env) {
         super.init(env);
         filer = env.getFiler();
         elements = env.getElementUtils();
+//        processingEnv.getMessager().printMessage(
+//                Diagnostic.Kind.ERROR,
+//                "🔥 GenerateDtoProcessor INICIALIZADO"
+//        );
     }
 
     @Override
-    public boolean process(Set<? extends TypeElement> annotations,
-            RoundEnvironment roundEnv) {
+    public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(GenerateDto.class)) {
             if (element.getKind() != ElementKind.CLASS) { continue; }
             TypeElement entity = (TypeElement) element;
