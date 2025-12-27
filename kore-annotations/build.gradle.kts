@@ -11,9 +11,9 @@ java {
 publishing {
     publications {
         register<MavenPublication>("release") {
-//            groupId = "com.github.pedroolivagil.kore"
+            groupId = "com.github.pedroolivagil"
             artifactId = "kore-annotations"
-            version = "1.0.11"
+            version = "1.0.1"
         }
     }
 }
