@@ -21,6 +21,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Kore"
-include(":Kore")
-include(":kore-annotations")
-include(":kore-processor")
+include(":Kore", ":kore-annotations", ":kore-processor")
