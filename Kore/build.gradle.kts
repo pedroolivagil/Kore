@@ -75,11 +75,7 @@ publishing {
         register<MavenPublication>("release") {
             groupId = "com.github.pedroolivagil"
             artifactId = "kore"
-            version = "1.0.8"
-
-            afterEvaluate {
-                from(components["release"])
-            }
+            version = "1.0.9"
         }
     }
 }

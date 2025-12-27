@@ -18,7 +18,7 @@ publishing {
         register<MavenPublication>("release") {
             groupId = "com.github.pedroolivagil"
             artifactId = "kore-processor"
-            version = "1.0.8"
+            version = "1.0.9"
         }
     }
 }

@@ -13,7 +13,7 @@ publishing {
         register<MavenPublication>("release") {
             groupId = "com.github.pedroolivagil"
             artifactId = "kore-annotations"
-            version = "1.0.8"
+            version = "1.0.9"
         }
     }
 }
