@@ -73,9 +73,9 @@ dependencies {
 publishing {
     publications {
         register<MavenPublication>("release") {
-            groupId = "com.github.pedroolivagil"
+            groupId = "com.github.pedroolivagil.kore"
             artifactId = "kore"
-            version = "1.0.9"
+            version = "1.0.10"
         }
     }
 }
