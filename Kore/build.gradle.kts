@@ -52,6 +52,8 @@ dependencies {
     implementation(libs.exp4j)
     implementation(libs.activity)
     implementation(libs.legacy.support.v4)
+    implementation(project(":kore-annotations"))
+    annotationProcessor(project(":kore-processor"))
     compileOnly(libs.lombok)
     annotationProcessor(libs.lombok)
     implementation(libs.room.runtime)
