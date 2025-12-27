@@ -16,9 +16,9 @@ dependencies {
 publishing {
     publications {
         register<MavenPublication>("release") {
-            groupId = "com.github.pedroolivagil.kore"
+//            groupId = "com.github.pedroolivagil.kore"
             artifactId = "kore-processor"
-            version = "1.0.10"
+            version = "1.0.11"
         }
     }
 }
