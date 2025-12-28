@@ -64,7 +64,7 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         if (config.builder()) { sb.append("@Builder\n"); }
         sb.append("@NoArgsConstructor\n");
         sb.append("@AllArgsConstructor\n");
-        sb.append("public class ").append(dtoName).append(" extends KoreDto {\n\n");
+        sb.append("public class ").append(dtoName).append(" extends KoreDTO {\n\n");
         for (Element field : entity.getEnclosedElements()) {
             if (field.getKind() != ElementKind.FIELD) { continue; }
             VariableElement ve = (VariableElement) field;
