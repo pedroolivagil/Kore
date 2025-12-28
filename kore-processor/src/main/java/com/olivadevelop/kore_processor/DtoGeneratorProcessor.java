@@ -1,6 +1,7 @@
 package com.olivadevelop.kore_processor;
 
 import com.google.auto.service.AutoService;
+import com.olivadevelop.kore_annotations.DtoField;
 import com.olivadevelop.kore_annotations.GenerateDto;
 
 import java.io.IOException;
@@ -20,7 +21,6 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.Elements;
-import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
 @AutoService(Processor.class)
@@ -39,10 +39,6 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         super.init(env);
         filer = env.getFiler();
         elements = env.getElementUtils();
-//        processingEnv.getMessager().printMessage(
-//                Diagnostic.Kind.ERROR,
-//                "🔥 GenerateDtoProcessor INICIALIZADO"
-//        );
     }
 
     @Override
@@ -57,33 +53,40 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
     }
     private void generateDto(TypeElement entity, GenerateDto config) {
         String entityName = entity.getSimpleName().toString();
-        String dtoName = entityName + config.suffix();
+        String dtoName = config.name().isEmpty() ? entityName + config.suffix() : config.name();
         String pkg = config.dtoPackage();
+        String propertyPrefix = config.propertyPrefix();
         StringBuilder sb = new StringBuilder();
         sb.append("package ").append(pkg).append(";\n\n");
         sb.append("import lombok.*;\n\n");
+        sb.append("import com.olivadevelop.kore.db.dto.KoreDTO;\n\n");
         if (config.data()) { sb.append("@Data\n"); }
         if (config.builder()) { sb.append("@Builder\n"); }
         sb.append("@NoArgsConstructor\n");
         sb.append("@AllArgsConstructor\n");
-        sb.append("public class ").append(dtoName).append(" {\n\n");
+        sb.append("public class ").append(dtoName).append(" extends KoreDto {\n\n");
         for (Element field : entity.getEnclosedElements()) {
             if (field.getKind() != ElementKind.FIELD) { continue; }
             VariableElement ve = (VariableElement) field;
             // Ignorar static / transient
             Set<Modifier> modifiers = ve.getModifiers();
             if (modifiers.contains(Modifier.STATIC)) { continue; }
+            DtoField dtoField = ve.getAnnotation(DtoField.class);
+            if (dtoField != null && dtoField.ignore()) { continue; }
             String type = ve.asType().toString();
-            String name = ve.getSimpleName().toString();
-            sb.append("    private ").append(type)
-                    .append(" ").append(name).append(";\n");
+            String originalName = ve.getSimpleName().toString();
+            String finalName;
+            if (dtoField != null && !dtoField.name().isEmpty()) {
+                finalName = dtoField.name();
+            } else {
+                finalName = propertyPrefix + originalName;
+            }
+            sb.append("    private ").append(type).append(" ").append(finalName).append(";\n");
         }
         sb.append("}\n");
         try {
             JavaFileObject file = filer.createSourceFile(pkg + "." + dtoName);
-            try (Writer writer = file.openWriter()) {
-                writer.write(sb.toString());
-            }
+            try (Writer writer = file.openWriter()) { writer.write(sb.toString()); }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -19,6 +19,16 @@ public @interface GenerateDto {
      * User → UserDto
      */
     String suffix() default "Dto";
+    /**
+     * Nombre del DTO
+     * Ej: "User"
+     */
+    String name() default "";
+    /**
+     * Prefijo de las propiedades del DTO
+     * Ej: "user_"
+     */
+    String propertyPrefix() default "";
 
     /**
      * Añadir Lombok @Data
