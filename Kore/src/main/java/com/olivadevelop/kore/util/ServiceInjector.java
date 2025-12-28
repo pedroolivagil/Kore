@@ -1,7 +1,10 @@
 package com.olivadevelop.kore.util;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.olivadevelop.kore.Constants;
+import com.olivadevelop.kore.annotation.DefaultImpl;
 import com.olivadevelop.kore.annotation.InjectService;
 
 import java.lang.reflect.Field;
@@ -19,14 +22,17 @@ public interface ServiceInjector {
                     .collect(Collectors.toList());
             for (Field field : declaredFields) {
                 Class<?> type = field.getType();
+                DefaultImpl defImpl = type.getAnnotation(DefaultImpl.class);
+                if (defImpl == null) { continue; }
                 try {
-                    Method getMethod = type.getMethod("get", Context.class);
+                    Class<?> implType = defImpl.value();
+                    Method getMethod = implType.getMethod("get", Context.class);
                     Object service = getMethod.invoke(null, context.getApplicationContext());
                     field.setAccessible(true);
                     field.set(target, service);
                 } catch (Exception e) {
                     String message = "Cannot inject service " + type.getName() + " into field " + field.getName() + " of " + clazz.getName();
-                    throw new RuntimeException(message, e);
+                    Log.e(Constants.Log.TAG, message, e);
                 }
             }
             clazz = clazz.getSuperclass();
