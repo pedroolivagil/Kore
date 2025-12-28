@@ -28,17 +28,18 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.lottiefiles.dotlottie.core.widget.DotLottieAnimation;
 import com.olivadevelop.kore.Constants;
+import com.olivadevelop.kore.R;
+import com.olivadevelop.kore.databinding.LoaderWrapperBinding;
 import com.olivadevelop.kore.error.FormErrorException;
 import com.olivadevelop.kore.media.CameraPermissionProvider;
 import com.olivadevelop.kore.nav.Navigation;
 import com.olivadevelop.kore.security.PermissionContract;
 import com.olivadevelop.kore.security.PermissionManager;
 import com.olivadevelop.kore.ui.SnackbarBuilder;
+import com.olivadevelop.kore.util.ServiceInjector;
 import com.olivadevelop.kore.util.Utils;
 import com.olivadevelop.kore.viewmodel.KoreViewModel;
 import com.olivadevelop.kore.viewmodel.SimpleTextWatcher;
-import com.olivadevelop.kore.R;
-import com.olivadevelop.kore.databinding.LoaderWrapperBinding;
 import com.olivadevelop.thirdpart.anim.Animations;
 import com.olivadevelop.thirdpart.anim.CustomLottieEventListener;
 
@@ -82,6 +83,7 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
     @Override
     protected final void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ServiceInjector.inject(this, this);
         this.extras = getIntent().getExtras();
         this.permissionManager = new PermissionManager<>(this);
         this.binding = Utils.Reflex.initBinding(this);
