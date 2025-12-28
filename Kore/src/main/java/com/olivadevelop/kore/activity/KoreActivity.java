@@ -35,7 +35,7 @@ import com.olivadevelop.kore.security.PermissionContract;
 import com.olivadevelop.kore.security.PermissionManager;
 import com.olivadevelop.kore.ui.SnackbarBuilder;
 import com.olivadevelop.kore.util.Utils;
-import com.olivadevelop.kore.viewmodel.BasicViewModel;
+import com.olivadevelop.kore.viewmodel.KoreViewModel;
 import com.olivadevelop.kore.viewmodel.SimpleTextWatcher;
 import com.olivadevelop.kore.R;
 import com.olivadevelop.kore.databinding.LoaderWrapperBinding;
@@ -56,7 +56,7 @@ import lombok.Setter;
 
 @Getter
 @SuppressWarnings("unchecked")
-public abstract class BasicActivity<T extends ViewBinding, V extends BasicViewModel<?>> extends AppCompatActivity implements View.OnClickListener,
+public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewModel<?>> extends AppCompatActivity implements View.OnClickListener,
         CameraPermissionProvider {
     public interface OnActivityResultListener {
         void run(int requestCode, int resultCode, @Nullable Intent data);

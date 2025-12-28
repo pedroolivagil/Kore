@@ -23,7 +23,7 @@ import android.widget.ImageView;
 import androidx.core.content.FileProvider;
 
 import com.olivadevelop.kore.Constants;
-import com.olivadevelop.kore.activity.BasicActivity;
+import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.ui.SnackbarBuilder;
 import com.olivadevelop.kore.R;
 import com.squareup.picasso.Callback;
@@ -61,7 +61,7 @@ public interface CameraGalleryImageManager {
     static void loadImage(Uri uri, ImageView view, Callback callback) {
         Picasso.get().load(uri).placeholder(R.drawable.ic_img).error(R.drawable.ic_error).fit().centerCrop().into(view, callback);
     }
-    static void openGallery(BasicActivity<?, ?> activity) {
+    static void openGallery(KoreActivity<?, ?> activity) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && !activity.getPermissionManager().areGranted(activity.getReadStoragePermission())) {
             activity.getPermissionManager().requestPermissions(activity.getReadStoragePermission());
             return;
@@ -70,7 +70,7 @@ public interface CameraGalleryImageManager {
         photoPickerIntent.setType(Constants.IntentParam.INTENT_IMAGE_TYPE);
         startActivityForResult(activity, photoPickerIntent, REQUEST_CODE_GALLERY, null);
     }
-    static Uri openCamera(BasicActivity<?, ?> activity, View btn, String imageName) {
+    static Uri openCamera(KoreActivity<?, ?> activity, View btn, String imageName) {
         Uri photoUri = null;
         if (!activity.getPermissionManager().areGranted(activity.getCameraPermission())) {
             activity.getPermissionManager().requestPermissions(activity.getCameraPermission());
@@ -87,7 +87,7 @@ public interface CameraGalleryImageManager {
         startActivityForResult(activity, takePictureIntent, REQUEST_IMAGE_CAPTURE, null);
         return photoUri;
     }
-    static File createImageFile(BasicActivity<?, ?> activity, String url) throws IOException {
+    static File createImageFile(KoreActivity<?, ?> activity, String url) throws IOException {
         String timeStamp = new SimpleDateFormat(Constants.Formats.YYYY_MM_DD_HH_MM_SS, Locale.getDefault()).format(new Date());
         File storageDir = activity.getExternalFilesDir(url);
         return File.createTempFile("image_" + timeStamp, Constants.Files.EXTENSION_JPG, storageDir);

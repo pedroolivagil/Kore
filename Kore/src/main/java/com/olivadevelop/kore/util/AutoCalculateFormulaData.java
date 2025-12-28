@@ -1,6 +1,6 @@
 package com.olivadevelop.kore.util;
 
-import com.olivadevelop.kore.component.BasicComponentView;
+import com.olivadevelop.kore.component.KoreComponentView;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -13,6 +13,6 @@ import lombok.Data;
 @Builder
 public class AutoCalculateFormulaData {
     private String formula;
-    private List<Pair<String, BasicComponentView<?>>> components;
+    private List<Pair<String, KoreComponentView<?>>> components;
     private List<Pair<String, Double>> parameters;
 }

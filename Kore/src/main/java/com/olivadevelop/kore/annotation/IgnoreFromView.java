@@ -1,6 +1,6 @@
 package com.olivadevelop.kore.annotation;
 
-import com.olivadevelop.kore.activity.BasicActivity;
+import com.olivadevelop.kore.activity.KoreActivity;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IgnoreFromView {
-    Class<BasicActivity<?, ?>>[] value();
+    Class<KoreActivity<?, ?>>[] value();
 }

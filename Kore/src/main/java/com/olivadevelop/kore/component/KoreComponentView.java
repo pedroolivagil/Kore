@@ -15,7 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
 
-import com.olivadevelop.kore.activity.BasicActivity;
+import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.annotation.RegularExpressionField;
 import com.olivadevelop.kore.preferences.PreferenceField;
 import com.olivadevelop.kore.util.AutoCalculateFormulaData;
@@ -38,7 +38,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-public abstract class BasicComponentView<T extends ViewBinding> extends LinearLayout implements View.OnClickListener, View.OnTouchListener {
+public abstract class KoreComponentView<T extends ViewBinding> extends LinearLayout implements View.OnClickListener, View.OnTouchListener {
 
     @Setter
     private boolean hasCleanPending;
@@ -47,7 +47,7 @@ public abstract class BasicComponentView<T extends ViewBinding> extends LinearLa
     @Setter
     private AutoCalculateFormulaData autocalculateFormula;
     @Setter
-    private BasicActivity<?, ?> activity;
+    private KoreActivity<?, ?> activity;
     @Setter
     private OnValueChangeAutocalcule onValueChangeAutocalcule;
     @Setter
@@ -64,9 +64,9 @@ public abstract class BasicComponentView<T extends ViewBinding> extends LinearLa
     private final T binding;
     private final DisabledOverlayBinding disabledOverlayBinding;
 
-    public BasicComponentView(Context context, @Nullable AttributeSet attrs) {
+    public KoreComponentView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        this.activity = context instanceof BasicActivity<?, ?> ? (BasicActivity<?, ?>) context : null;
+        this.activity = context instanceof KoreActivity<?, ?> ? (KoreActivity<?, ?>) context : null;
         this.binding = Utils.Reflex.initBinding(this);
         setDisabled(false);
         this.disabledOverlayBinding = getDisabledOverlayBinding();
@@ -75,7 +75,7 @@ public abstract class BasicComponentView<T extends ViewBinding> extends LinearLa
         setOnFocusChangeListener((v, hasFocus) -> { if (hasFocus) { this.activity.scrollTo(0, v.getBottom()); } });
         if (attrs != null) { processAttrs(context, attrs); }
     }
-    public final BasicComponentView<T> setProperty(Map<Class<?>, List<? extends Annotation>> property) {
+    public final KoreComponentView<T> setProperty(Map<Class<?>, List<? extends Annotation>> property) {
         this.property = property;
         setType();
         return this;
@@ -129,7 +129,7 @@ public abstract class BasicComponentView<T extends ViewBinding> extends LinearLa
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-        BasicComponentView<?> that = (BasicComponentView<?>) o;
+        KoreComponentView<?> that = (KoreComponentView<?>) o;
         return this.mandatory == that.mandatory && Objects.equals(this.binding, that.binding) && Objects.equals(this.regexPattern, that.regexPattern) && Objects.equals(this.property, that.property) && Objects.equals(this.activity, that.activity);
     }
     @Override
@@ -220,11 +220,11 @@ public abstract class BasicComponentView<T extends ViewBinding> extends LinearLa
     }
 
     public interface OnValueChange {
-        void run(BasicComponentView<?> s);
+        void run(KoreComponentView<?> s);
     }
 
     public interface OnClick {
-        void run(BasicComponentView<?> s);
+        void run(KoreComponentView<?> s);
     }
 
     @Getter

@@ -16,8 +16,8 @@ import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.android.gms.ads.nativead.NativeAd;
 import com.google.android.gms.ads.nativead.NativeAdOptions;
 import com.olivadevelop.kore.Constants;
-import com.olivadevelop.kore.activity.BasicActivity;
-import com.olivadevelop.kore.viewmodel.BasicViewModel;
+import com.olivadevelop.kore.activity.KoreActivity;
+import com.olivadevelop.kore.viewmodel.KoreViewModel;
 
 public interface AdsManager {
     static void loadInterstitial(Context context, String id, Consumer<InterstitialAd> adConsumer) {
@@ -36,5 +36,5 @@ public interface AdsManager {
             }).withNativeAdOptions(new NativeAdOptions.Builder().build()).build();
         }).start();
     }
-    <V extends BasicViewModel<?>, T extends ViewBinding> boolean shouldShowAds(BasicActivity<T, V> tvBasicActivity);
+    <V extends KoreViewModel<?>, T extends ViewBinding> boolean shouldShowAds(KoreActivity<T, V> tvKoreActivity);
 }

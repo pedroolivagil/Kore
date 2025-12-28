@@ -10,7 +10,7 @@ import com.olivadevelop.kore.preferences.PreferencesHelper;
 import com.olivadevelop.kore.databinding.CompCustomSwitchBinding;
 import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
 
-public class CustomSwitchView extends BasicComponentView<CompCustomSwitchBinding> {
+public class CustomSwitchView extends KoreComponentView<CompCustomSwitchBinding> {
 
     public CustomSwitchView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);

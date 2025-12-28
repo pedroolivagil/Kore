@@ -9,7 +9,7 @@ import androidx.annotation.Nullable;
 import com.olivadevelop.kore.databinding.CompButtonRowBinding;
 import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
 
-public class CustomButtonRowView extends BasicComponentView<CompButtonRowBinding> {
+public class CustomButtonRowView extends KoreComponentView<CompButtonRowBinding> {
 
     public CustomButtonRowView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);

@@ -14,10 +14,10 @@ import androidx.viewbinding.ViewBinding;
 
 import com.google.android.gms.ads.AdView;
 import com.olivadevelop.kore.Constants;
-import com.olivadevelop.kore.activity.BasicActivity;
-import com.olivadevelop.kore.component.BasicComponentView;
+import com.olivadevelop.kore.activity.KoreActivity;
+import com.olivadevelop.kore.component.KoreComponentView;
 import com.olivadevelop.kore.util.Utils;
-import com.olivadevelop.kore.viewmodel.BasicViewModel;
+import com.olivadevelop.kore.viewmodel.KoreViewModel;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,7 +32,7 @@ import lombok.Getter;
 
 @Serializable
 @SuppressWarnings("unchecked")
-public abstract class BasicFragment<A extends BasicActivity<V, L>, V extends ViewBinding, L extends BasicViewModel<?>, T extends BasicViewModel<?>,
+public abstract class KoreFragment<A extends KoreActivity<V, L>, V extends ViewBinding, L extends KoreViewModel<?>, T extends KoreViewModel<?>,
         B extends ViewBinding> extends Fragment implements View.OnClickListener {
     @Getter
     private T viewModel;
@@ -73,12 +73,12 @@ public abstract class BasicFragment<A extends BasicActivity<V, L>, V extends Vie
     protected final A getParentActivity() { return (A) getActivity(); }
     public final void addPostViewCreatedListener(@NonNull Runnable runnable) { this.listeners.add(runnable); }
     protected final void addClickListener(View v) { if (v != null) { v.setOnClickListener(this); } }
-    protected final List<BasicComponentView<?>> invalidComponents(LinearLayout wrapperLayoutStep) {
-        List<BasicComponentView<?>> list = new ArrayList<>();
+    protected final List<KoreComponentView<?>> invalidComponents(LinearLayout wrapperLayoutStep) {
+        List<KoreComponentView<?>> list = new ArrayList<>();
         for (int x = 0; x < wrapperLayoutStep.getChildCount(); x++) {
             View child = wrapperLayoutStep.getChildAt(x);
-            if (child instanceof BasicComponentView<?>) {
-                BasicComponentView<?> componentView = (BasicComponentView<?>) child;
+            if (child instanceof KoreComponentView<?>) {
+                KoreComponentView<?> componentView = (KoreComponentView<?>) child;
                 if (!(componentView).isValid()) { list.add(componentView); }
             }
         }
@@ -87,7 +87,7 @@ public abstract class BasicFragment<A extends BasicActivity<V, L>, V extends Vie
     protected final void setCleanComponents(LinearLayout wrapperLayoutStep) {
         for (int x = 0; x < wrapperLayoutStep.getChildCount(); x++) {
             View child = wrapperLayoutStep.getChildAt(x);
-            if (child instanceof BasicComponentView<?>) { ((BasicComponentView<?>) child).setHasCleanPending(true); }
+            if (child instanceof KoreComponentView<?>) { ((KoreComponentView<?>) child).setHasCleanPending(true); }
         }
     }
     protected final <U> Optional<U> getExtraValue(String key) {

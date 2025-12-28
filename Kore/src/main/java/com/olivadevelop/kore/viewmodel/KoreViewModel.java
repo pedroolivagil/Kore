@@ -8,7 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.olivadevelop.kore.Constants;
-import com.olivadevelop.kore.component.BasicComponentView;
+import com.olivadevelop.kore.component.KoreComponentView;
 import com.olivadevelop.kore.db.entity.KoreEntity;
 import com.olivadevelop.kore.error.InvalidPropertyErrorVM;
 import com.olivadevelop.kore.nav.Navigation;
@@ -29,22 +29,22 @@ import lombok.Setter;
 
 @Setter
 @Getter
-public abstract class BasicViewModel<T extends KoreEntity> extends ViewModel implements Cloneable {
+public abstract class KoreViewModel<T extends KoreEntity> extends ViewModel implements Cloneable {
     private final MutableLiveData<Navigation.NavigationScreen> screenBack = new MutableLiveData<>(null);
 
     private Context ctx;
     private T data;
     private boolean hasValidation = true;
-    private Map<String, BasicComponentView<?>> componentViewMap = new HashMap<>();
+    private Map<String, KoreComponentView<?>> componentViewMap = new HashMap<>();
     private Set<InvalidPropertyErrorVM> errors = new HashSet<>();
     public abstract boolean isValid();
-    public abstract BasicViewModel<T> buildEntityData();
+    public abstract KoreViewModel<T> buildEntityData();
 
     @NonNull
     @Override
-    public BasicViewModel<T> clone() {
+    public KoreViewModel<T> clone() {
         try {
-            return (BasicViewModel<T>) super.clone();
+            return (KoreViewModel<T>) super.clone();
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
         }
@@ -52,7 +52,7 @@ public abstract class BasicViewModel<T extends KoreEntity> extends ViewModel imp
     public void reload() {
         buildNewData();
     }
-    public BasicViewModel() { buildNewData(); }
+    public KoreViewModel() { buildNewData(); }
     public void clearData() { buildNewData(); }
     protected final void buildNewData() {
         try {
@@ -61,7 +61,7 @@ public abstract class BasicViewModel<T extends KoreEntity> extends ViewModel imp
             Log.e(Constants.Log.TAG, "Error al crear los datos del viewmodel. " + e.getMessage());
         }
     }
-    public final void copyDataViewModel(BasicViewModel<?> viewModel) {
+    public final void copyDataViewModel(KoreViewModel<?> viewModel) {
         Predicate<? super Field> filter = f -> {
             String name = f.getName();
             return !name.equals("componentViewMap") && !name.equals("errors") && !name.equals("hasValidation") && !name.equals("step") && !name.equals("impl");
@@ -78,7 +78,7 @@ public abstract class BasicViewModel<T extends KoreEntity> extends ViewModel imp
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-        BasicViewModel<?> that = (BasicViewModel<?>) o;
+        KoreViewModel<?> that = (KoreViewModel<?>) o;
         return hasValidation == that.hasValidation && Objects.equals(componentViewMap, that.componentViewMap) && Objects.equals(errors, that.errors) && Objects.equals(data, that.data);
     }
     @Override

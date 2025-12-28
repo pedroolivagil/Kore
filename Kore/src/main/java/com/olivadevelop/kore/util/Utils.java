@@ -36,7 +36,7 @@ import androidx.viewbinding.ViewBinding;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.olivadevelop.kore.Constants;
 import com.olivadevelop.kore.R;
-import com.olivadevelop.kore.activity.BasicActivity;
+import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.annotation.RegularExpressionField;
 
 import org.apache.commons.lang3.time.DateUtils;
@@ -289,7 +289,7 @@ public abstract class Utils {
     public static <T> void processListWithIndex(List<T> list, BiConsumer<Integer, T> action) {
         for (int i = 0; i < list.size(); i++) { action.accept(i, list.get(i)); }
     }
-    public static String intStringFromInputType(BasicActivity<?, ?> activity, Class<?> property, RegularExpressionField regex) {
+    public static String intStringFromInputType(KoreActivity<?, ?> activity, Class<?> property, RegularExpressionField regex) {
         if (property == null || regex == null) { return null; }
         String result = null;
         if (property.isAssignableFrom(Number.class)) { result = activity.getString(R.string.error_input_type_number); }

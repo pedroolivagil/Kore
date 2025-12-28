@@ -8,7 +8,7 @@ import androidx.annotation.AnimRes;
 import androidx.fragment.app.Fragment;
 
 import com.olivadevelop.kore.Constants;
-import com.olivadevelop.kore.activity.BasicActivity;
+import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.util.Utils;
 
 import java.io.Serializable;
@@ -32,6 +32,7 @@ public final class Navigation {
         boolean isIgnoreHistory();
         Optional<? extends NavigationScreen> fromPageFragment(Class<? extends Activity> page, Class<? extends Fragment> fragment);
     }
+
     public interface AnimationScreenInOut extends Serializable {
         @AnimRes
         int getAnimOut();
@@ -40,7 +41,7 @@ public final class Navigation {
     }
     public void navigate(NavigationData data) { navigateToActivity(data, true); }
     private void navigateToActivity(NavigationData data, boolean toHistory) {
-        BasicActivity<?, ?> ctx = data.getContext();
+        KoreActivity<?, ?> ctx = data.getContext();
         NavigationScreen from = data.getFrom();
         NavigationScreen to = data.getTo();
         Map<String, Object> map = new HashMap<>(data.getArgs());
@@ -52,16 +53,16 @@ public final class Navigation {
         Intent intent = new Intent(ctx, to.getPage());
         Utils.addArgsToIntent(data.getArgs(), intent);
         ctx.startActivity(intent);
-        overrideAnimation(ctx, data.getAnimation());
+        if (data.getAnimation() != null) { overrideAnimation(ctx, data.getAnimation()); }
         if (data.isFinishCurrent()) { ctx.finish(); }
         if (!toHistory || data.getFrom().isIgnoreHistory()) { return; }
         this.history.add(new HistoryData(this.history.size(), ctx, from, to, data.getArgs(), data));
     }
-    private void navigateToActivity(BasicActivity<?, ?> ctx, HistoryData h) {
+    private void navigateToActivity(KoreActivity<?, ?> ctx, HistoryData h) {
         NavigationData d = NavigationData.builder(ctx, h.to, h.from).args(h.args).build();
         this.navigateToActivity(d, false);
     }
-    public void goBack(BasicActivity<?, ?> ctx, Map<String, Object> args) {
+    public void goBack(KoreActivity<?, ?> ctx, Map<String, Object> args) {
         HistoryData h = lastHistory();
         if (h == null) { return; }
         if (args != null) { args.forEach((key, value) -> h.getArgs().computeIfAbsent(key, k -> value)); }
@@ -82,12 +83,12 @@ public final class Navigation {
     @Data
     private static class HistoryData {
         private final int order;
-        private final BasicActivity<?, ?> ctx;
+        private final KoreActivity<?, ?> ctx;
         private final NavigationScreen from;
         private final NavigationScreen to;
         private final NavigationData data;
         private final Map<String, Object> args = new HashMap<>();
-        public HistoryData(int order, BasicActivity<?, ?> ctx, NavigationScreen from, NavigationScreen to, Map<String, Object> args, NavigationData data) {
+        public HistoryData(int order, KoreActivity<?, ?> ctx, NavigationScreen from, NavigationScreen to, Map<String, Object> args, NavigationData data) {
             this.order = order;
             this.ctx = ctx;
             this.from = from;
