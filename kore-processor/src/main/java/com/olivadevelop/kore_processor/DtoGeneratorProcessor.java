@@ -20,6 +20,8 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.tools.JavaFileObject;
 
@@ -75,11 +77,18 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
             if (dtoField != null && dtoField.ignore()) { continue; }
             String type = ve.asType().toString();
             String originalName = ve.getSimpleName().toString();
-            String finalName;
-            if (dtoField != null && !dtoField.name().isEmpty()) {
-                finalName = dtoField.name();
-            } else {
-                finalName = propertyPrefix + originalName;
+            String finalName = propertyPrefix + originalName;
+            if (dtoField != null) {
+                if (!dtoField.name().isEmpty()) { finalName = dtoField.name(); }
+                if (dtoField.type() != null && dtoField.type() != void.class) {
+                    if (isList(ve.asType())) {
+                        type = "java.util.List<" + dtoField.type().getCanonicalName() + ">";
+                    } else if (isSet(ve.asType())) {
+                        type = "java.util.Set<" + dtoField.type().getCanonicalName() + ">";
+                    } else {
+                        type = dtoField.type().getCanonicalName();
+                    }
+                }
             }
             sb.append("    private ").append(type).append(" ").append(finalName).append(";\n");
         }
@@ -90,5 +99,15 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    private boolean isList(TypeMirror type) {
+        if (!(type instanceof DeclaredType)) { return false; }
+        String raw = ((DeclaredType) type).asElement().toString();
+        return raw.equals("java.util.List");
+    }
+    private boolean isSet(TypeMirror type) {
+        if (!(type instanceof DeclaredType)) { return false; }
+        String raw = ((DeclaredType) type).asElement().toString();
+        return raw.equals("java.util.Set");
     }
 }
