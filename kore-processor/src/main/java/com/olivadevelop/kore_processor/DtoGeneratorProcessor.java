@@ -54,8 +54,7 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         return true;
     }
     private void generateDto(TypeElement entity, GenerateDto config) {
-        String entityName = entity.getSimpleName().toString();
-        String dtoName = config.name().isEmpty() ? entityName + config.suffix() : config.name();
+        String dtoName = getDtoName(entity, config);
         String pkg = config.dtoPackage();
         String propertyPrefix = config.propertyPrefix();
         StringBuilder sb = new StringBuilder();
@@ -74,19 +73,34 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
             Set<Modifier> modifiers = ve.getModifiers();
             if (modifiers.contains(Modifier.STATIC)) { continue; }
             DtoField dtoField = ve.getAnnotation(DtoField.class);
-            if (dtoField != null && dtoField.ignore()) { continue; }
-            String type = ve.asType().toString();
+            TypeMirror fieldType = ve.asType();
+            String type = fieldType.toString();
             String originalName = ve.getSimpleName().toString();
             String finalName = propertyPrefix + originalName;
             if (dtoField != null) {
+                if (dtoField.ignore()) { continue; }
                 if (!dtoField.name().isEmpty()) { finalName = dtoField.name(); }
                 if (dtoField.type() != null && dtoField.type() != void.class) {
-                    if (isList(ve.asType())) {
+                    if (isList(fieldType)) {
                         type = "java.util.List<" + dtoField.type().getCanonicalName() + ">";
-                    } else if (isSet(ve.asType())) {
+                    } else if (isSet(fieldType)) {
                         type = "java.util.Set<" + dtoField.type().getCanonicalName() + ">";
                     } else {
                         type = dtoField.type().getCanonicalName();
+                    }
+                }
+            } else if (isList(fieldType) || isSet(fieldType)) {
+                DeclaredType declaredType = (DeclaredType) fieldType;
+                if (!declaredType.getTypeArguments().isEmpty()) {
+                    TypeMirror genericType = declaredType.getTypeArguments().get(0);
+                    TypeElement genericElement = (TypeElement) processingEnv.getTypeUtils().asElement(genericType);
+                    GenerateDto genDto = genericElement.getAnnotation(GenerateDto.class);
+                    if (genDto == null) { continue; }
+                    String name = getDtoName(genericElement, genDto);
+                    if (isList(fieldType)) {
+                        type = "java.util.List<" + name + ">";
+                    } else if (isSet(fieldType)) {
+                        type = "java.util.Set<" + name + ">";
                     }
                 }
             }
@@ -99,6 +113,10 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+    private static String getDtoName(TypeElement entity, GenerateDto config) {
+        String entityName = entity.getSimpleName().toString();
+        return config.name().isEmpty() ? entityName + config.suffix() : config.name();
     }
     private boolean isList(TypeMirror type) {
         if (!(type instanceof DeclaredType)) { return false; }
