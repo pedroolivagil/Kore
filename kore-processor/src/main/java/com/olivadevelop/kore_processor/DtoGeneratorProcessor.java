@@ -6,6 +6,7 @@ import com.olivadevelop.kore_annotations.GenerateDto;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -54,6 +55,9 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         return true;
     }
     private void generateDto(TypeElement entity, GenerateDto config) {
+        Set<String> imports = new HashSet<>();
+        imports.add("lombok.*");
+        imports.add("com.olivadevelop.kore.db.dto.KoreDTO");
         String dtoName = getDtoName(entity, config);
         String pkg = config.dtoPackage();
         String propertyPrefix = config.propertyPrefix();
@@ -82,9 +86,11 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                 if (!dtoField.name().isEmpty()) { finalName = dtoField.name(); }
                 if (dtoField.type() != null && dtoField.type() != void.class) {
                     if (isList(fieldType)) {
-                        type = "java.util.List<" + dtoField.type().getCanonicalName() + ">";
+//                        type = "java.util.List<" + dtoField.type().getCanonicalName() + ">";
+                        type = useCollection("java.util.List", dtoField.type().getCanonicalName(), imports);
                     } else if (isSet(fieldType)) {
-                        type = "java.util.Set<" + dtoField.type().getCanonicalName() + ">";
+//                        type = "java.util.Set<" + dtoField.type().getCanonicalName() + ">";
+                        type = useCollection("java.util.Set", dtoField.type().getCanonicalName(), imports);
                     } else {
                         type = dtoField.type().getCanonicalName();
                     }
@@ -98,9 +104,11 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                     if (genDto == null) { continue; }
                     String name = getDtoName(genericElement, genDto);
                     if (isList(fieldType)) {
-                        type = "java.util.List<" + name + ">";
+//                        type = "java.util.List<" + name + ">";
+                        type = useCollection("java.util.List", name, imports);
                     } else if (isSet(fieldType)) {
-                        type = "java.util.Set<" + name + ">";
+//                        type = "java.util.Set<" + name + ">";
+                        type = useCollection("java.util.Set", name, imports);
                     }
                 }
             }
@@ -128,4 +136,20 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         String raw = ((DeclaredType) type).asElement().toString();
         return raw.equals("java.util.Set");
     }
+    private String useType(TypeMirror type, Set<String> imports) {
+        if (!(type instanceof DeclaredType)) { return type.toString(); }
+        TypeElement element = (TypeElement) ((DeclaredType) type).asElement();
+        String fqcn = element.getQualifiedName().toString();
+        // No importes java.lang
+        if (!fqcn.startsWith("java.lang")) { imports.add(fqcn); }
+        return element.getSimpleName().toString();
+    }
+    private String useCollection(String collectionFqn, String genericFqn, Set<String> imports) {
+        imports.add(collectionFqn);
+        imports.add(genericFqn);
+        String collectionSimple = collectionFqn.substring(collectionFqn.lastIndexOf('.') + 1);
+        String genericSimple = genericFqn.substring(genericFqn.lastIndexOf('.') + 1);
+        return collectionSimple + "<" + genericSimple + ">";
+    }
+
 }
