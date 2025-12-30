@@ -71,7 +71,7 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         final StringBuilder sb = new StringBuilder();
         sb.append("package ").append(pkg).append(SEMICOLON).append(LINE_BREAK_DOUBLE);
         imports.forEach(i -> sb.append("import ").append(i).append(SEMICOLON).append(LINE_BREAK));
-        sb.append("public class ").append(dtoName).append(" extends KoreDTO {").append(LINE_BREAK_DOUBLE);
+        sb.append("public class ").append(dtoName).append(" extends KoreDTO {").append(LINE_BREAK);
         properties.forEach((t, n) -> sb.append("    private ").append(t).append(" ").append(n).append(SEMICOLON).append(LINE_BREAK));
         sb.append("}").append(LINE_BREAK);
         try {
@@ -121,9 +121,9 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                     if (genDto == null) { continue; }
                     String name = getDtoName(genericElement, genDto);
                     if (isList(fieldType)) {
-                        type = useCollection(JAVA_UTIL_LIST, name, imports);
+                        type = useCollection(JAVA_UTIL_LIST, genericElement.getQualifiedName().toString(), imports);
                     } else if (isSet(fieldType)) {
-                        type = useCollection(JAVA_UTIL_SET, name, imports);
+                        type = useCollection(JAVA_UTIL_SET, genericElement.getQualifiedName().toString(), imports);
                     }
                 }
             }
@@ -182,10 +182,10 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                     String name = getDtoName(genericElement, genDto);
                     if (isList(fieldType)) {
 //                        type = "java.util.List<" + name + ">";
-                        type = useCollection(JAVA_UTIL_LIST, name, imports);
+                        type = useCollection(JAVA_UTIL_LIST, genericElement.getQualifiedName().toString(), imports);
                     } else if (isSet(fieldType)) {
 //                        type = "java.util.Set<" + name + ">";
-                        type = useCollection(JAVA_UTIL_SET, name, imports);
+                        type = useCollection(JAVA_UTIL_SET, genericElement.getQualifiedName().toString(), imports);
                     }
                 }
             }
