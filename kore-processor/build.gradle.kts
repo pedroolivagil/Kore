@@ -19,7 +19,7 @@ publishing {
     publications {
         register<MavenPublication>("release") {
             artifactId = "kore-processor"
-            version = "1.0.27"
+            version = "1.0.28"
 
             from(components["java"])
         }

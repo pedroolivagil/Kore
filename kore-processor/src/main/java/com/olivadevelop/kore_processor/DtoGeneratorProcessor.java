@@ -6,9 +6,8 @@ import com.olivadevelop.kore_annotations.GenerateDto;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -66,13 +65,18 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         String dtoName = getDtoName(entity, config);
         String pkg = config.dtoPackage();
         Set<String> imports = new HashSet<>();
-        Map<String, String> properties = new HashMap<>();
+        imports.add(config.dtoPackage());
+        Set<Property> properties = new HashSet<>();
         calculateClass(entity, config, imports, properties);
         final StringBuilder sb = new StringBuilder();
         sb.append("package ").append(pkg).append(SEMICOLON).append(LINE_BREAK_DOUBLE);
-        imports.forEach(i -> sb.append("import ").append(i).append(SEMICOLON).append(LINE_BREAK));
+        imports.stream()
+                .filter(i -> !i.equalsIgnoreCase(config.dtoPackage()))
+                .sorted().forEach(i -> sb.append("import ").append(i).append(SEMICOLON).append(LINE_BREAK));
         sb.append("public class ").append(dtoName).append(" extends KoreDTO {").append(LINE_BREAK);
-        properties.forEach((t, n) -> sb.append("    private ").append(t).append(" ").append(n).append(SEMICOLON).append(LINE_BREAK));
+        properties.stream()
+                .sorted(Comparator.comparing(p -> p.order))
+                .forEach(p -> sb.append("    private ").append(p.type).append(" ").append(p.property).append(SEMICOLON).append(LINE_BREAK));
         sb.append("}").append(LINE_BREAK);
         try {
             JavaFileObject file = filer.createSourceFile(pkg + "." + dtoName);
@@ -81,12 +85,13 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
             throw new RuntimeException(e);
         }
     }
-    private void calculateClass(TypeElement entity, GenerateDto config, Set<String> imports, Map<String, String> properties) {
+    private void calculateClass(TypeElement entity, GenerateDto config, Set<String> imports, Set<Property> properties) {
         imports.add(lombok.Builder.class.getCanonicalName());
         imports.add(lombok.Data.class.getCanonicalName());
         imports.add(lombok.NoArgsConstructor.class.getCanonicalName());
         imports.add(lombok.AllArgsConstructor.class.getCanonicalName());
         imports.add(COM_OLIVADEVELOP_KORE_DB_DTO_KORE_DTO);
+        int order = 0;
         for (Element field : entity.getEnclosedElements()) {
             if (field.getKind() != ElementKind.FIELD) { continue; }
             VariableElement ve = (VariableElement) field;
@@ -119,7 +124,7 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                     TypeElement genericElement = (TypeElement) processingEnv.getTypeUtils().asElement(genericType);
                     GenerateDto genDto = genericElement.getAnnotation(GenerateDto.class);
                     if (genDto == null) { continue; }
-                    String name = getDtoName(genericElement, genDto);
+                    finalName = getDtoName(genericElement, genDto);
                     if (isList(fieldType)) {
                         type = useCollection(JAVA_UTIL_LIST, genericElement.getQualifiedName().toString(), imports);
                     } else if (isSet(fieldType)) {
@@ -127,76 +132,7 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                     }
                 }
             }
-            properties.put(type, finalName);
-        }
-    }
-    private void generateDto2(TypeElement entity, GenerateDto config) {
-        Set<String> imports = new HashSet<>();
-        imports.add("lombok.*");
-        imports.add(COM_OLIVADEVELOP_KORE_DB_DTO_KORE_DTO);
-        String dtoName = getDtoName(entity, config);
-        String pkg = config.dtoPackage();
-        String propertyPrefix = config.propertyPrefix();
-        StringBuilder sb = new StringBuilder();
-        sb.append("package ").append(pkg).append(";\n\n");
-        sb.append("import lombok.*;\n\n");
-        sb.append("import com.olivadevelop.kore.db.dto.KoreDTO;\n\n");
-        if (config.data()) { sb.append("@Data\n"); }
-        if (config.builder()) { sb.append("@Builder\n"); }
-        sb.append("@NoArgsConstructor\n");
-        sb.append("@AllArgsConstructor\n");
-        sb.append("public class ").append(dtoName).append(" extends KoreDTO {\n\n");
-        for (Element field : entity.getEnclosedElements()) {
-            if (field.getKind() != ElementKind.FIELD) { continue; }
-            VariableElement ve = (VariableElement) field;
-            // Ignorar static / transient
-            Set<Modifier> modifiers = ve.getModifiers();
-            if (modifiers.contains(Modifier.STATIC)) { continue; }
-            DtoField dtoField = ve.getAnnotation(DtoField.class);
-            TypeMirror fieldType = ve.asType();
-            String type = useType(fieldType, imports);
-            String originalName = ve.getSimpleName().toString();
-            String finalName = propertyPrefix + originalName;
-            if (dtoField != null) {
-                if (dtoField.ignore()) { continue; }
-                if (!dtoField.name().isEmpty()) { finalName = dtoField.name(); }
-                if (dtoField.type() != null && dtoField.type() != void.class) {
-                    if (isList(fieldType)) {
-//                        type = "java.util.List<" + dtoField.type().getCanonicalName() + ">";
-                        type = useCollection(JAVA_UTIL_LIST, dtoField.type().getCanonicalName(), imports);
-                    } else if (isSet(fieldType)) {
-//                        type = "java.util.Set<" + dtoField.type().getCanonicalName() + ">";
-                        type = useCollection(JAVA_UTIL_SET, dtoField.type().getCanonicalName(), imports);
-                    } else {
-                        type = dtoField.type().getSimpleName();
-                        imports.add(dtoField.type().getCanonicalName());
-                    }
-                }
-            } else if (isList(fieldType) || isSet(fieldType)) {
-                DeclaredType declaredType = (DeclaredType) fieldType;
-                if (!declaredType.getTypeArguments().isEmpty()) {
-                    TypeMirror genericType = declaredType.getTypeArguments().get(0);
-                    TypeElement genericElement = (TypeElement) processingEnv.getTypeUtils().asElement(genericType);
-                    GenerateDto genDto = genericElement.getAnnotation(GenerateDto.class);
-                    if (genDto == null) { continue; }
-                    String name = getDtoName(genericElement, genDto);
-                    if (isList(fieldType)) {
-//                        type = "java.util.List<" + name + ">";
-                        type = useCollection(JAVA_UTIL_LIST, genericElement.getQualifiedName().toString(), imports);
-                    } else if (isSet(fieldType)) {
-//                        type = "java.util.Set<" + name + ">";
-                        type = useCollection(JAVA_UTIL_SET, genericElement.getQualifiedName().toString(), imports);
-                    }
-                }
-            }
-            sb.append("    private ").append(type).append(" ").append(finalName).append(";\n");
-        }
-        sb.append("}\n");
-        try {
-            JavaFileObject file = filer.createSourceFile(pkg + "." + dtoName);
-            try (Writer writer = file.openWriter()) { writer.write(sb.toString()); }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+            properties.add(new Property(order++, type, finalName));
         }
     }
     private static String getDtoName(TypeElement entity, GenerateDto config) {
@@ -228,5 +164,14 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         String genericSimple = genericFqn.substring(genericFqn.lastIndexOf('.') + 1);
         return collectionSimple + "<" + genericSimple + ">";
     }
-
+    private static class Property {
+        private Integer order;
+        private String type;
+        private String property;
+        public Property(Integer order, String type, String property) {
+            this.order = order;
+            this.type = type;
+            this.property = property;
+        }
+    }
 }
