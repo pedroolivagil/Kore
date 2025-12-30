@@ -39,4 +39,5 @@ public @interface GenerateDto {
      * Añadir Lombok @Builder
      */
     boolean builder() default true;
+    boolean usePrimitives() default true;
 }

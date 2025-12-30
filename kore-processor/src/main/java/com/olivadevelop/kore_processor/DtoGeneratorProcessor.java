@@ -6,6 +6,7 @@ import com.olivadevelop.kore_annotations.GenerateDto;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Objects;
@@ -29,7 +30,7 @@ import javax.lang.model.util.Elements;
 import javax.tools.JavaFileObject;
 
 @AutoService(Processor.class)
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
+@SupportedSourceVersion(SourceVersion.RELEASE_11)
 public class DtoGeneratorProcessor extends AbstractProcessor {
 
     public static final String COM_OLIVADEVELOP_KORE_DB_DTO_KORE_DTO = "com.olivadevelop.kore.db.dto.KoreDTO";
@@ -71,17 +72,16 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         calculateClass(entity, config, imports, properties);
         final StringBuilder sb = new StringBuilder();
         sb.append("package ").append(pkg).append(SEMICOLON).append(LINE_BREAK_DOUBLE);
-        imports.stream()
-                .sorted().forEach(i -> sb.append("import ").append(i).append(SEMICOLON).append(LINE_BREAK));
+        imports.stream().sorted().forEach(i -> sb.append("import ").append(i).append(SEMICOLON).append(LINE_BREAK));
         sb.append(LINE_BREAK);
         sb.append("@Builder").append(LINE_BREAK);
         sb.append("@Data").append(LINE_BREAK);
         sb.append("@NoArgsConstructor").append(LINE_BREAK);
         sb.append("@AllArgsConstructor").append(LINE_BREAK);
+        sb.append("@EqualsAndHashCode(callSuper = true)").append(LINE_BREAK);
+        sb.append("@Generated(value = \"").append(entity.getSimpleName()).append(".class\", date = \"").append(getCurrentDate()).append("\", comments = \"").append(getComment()).append("\")").append(LINE_BREAK);
         sb.append("public class ").append(dtoName).append(" extends KoreDTO {").append(LINE_BREAK);
-        properties.stream()
-                .sorted(Comparator.comparing(p -> p.order))
-                .forEach(p -> sb.append("    private ").append(p.type).append(" ").append(p.property).append(SEMICOLON).append(LINE_BREAK));
+        properties.stream().sorted(Comparator.comparing(p -> p.order)).forEach(p -> sb.append("    private ").append(p.type).append(" ").append(p.property).append(SEMICOLON).append(LINE_BREAK));
         sb.append("}").append(LINE_BREAK);
         try {
             JavaFileObject file = filer.createSourceFile(pkg + "." + dtoName);
@@ -90,11 +90,20 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
             throw new RuntimeException(e);
         }
     }
+    private static String getComment() {
+        return "DTO Generated from version 1.30";
+    }
+    private String getCurrentDate() {
+        SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d MMMM, yyyy - HH:mm:ss", java.util.Locale.getDefault());
+        return sdf.format(new java.util.Date());
+    }
     private void calculateClass(TypeElement entity, GenerateDto config, Set<String> imports, Set<Property> properties) {
         imports.add(lombok.Builder.class.getCanonicalName());
         imports.add(lombok.Data.class.getCanonicalName());
         imports.add(lombok.NoArgsConstructor.class.getCanonicalName());
         imports.add(lombok.AllArgsConstructor.class.getCanonicalName());
+        imports.add(lombok.EqualsAndHashCode.class.getCanonicalName());
+        imports.add(javax.annotation.processing.Generated.class.getCanonicalName());
         imports.add(COM_OLIVADEVELOP_KORE_DB_DTO_KORE_DTO);
         int order = 0;
         for (Element field : entity.getEnclosedElements()) {
@@ -106,7 +115,7 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
             String propertyPrefix = config.propertyPrefix();
             DtoField dtoField = ve.getAnnotation(DtoField.class);
             TypeMirror fieldType = ve.asType();
-            String type = useType(fieldType, imports);
+            String type;
             String originalName = ve.getSimpleName().toString();
             String finalName = propertyPrefix + originalName;
             if (dtoField != null) {
@@ -121,6 +130,8 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                         type = dtoField.type().getSimpleName();
                         imports.add(dtoField.type().getCanonicalName());
                     }
+                } else {
+                    type = useType(fieldType, imports, config.usePrimitives());
                 }
             } else if (isList(fieldType) || isSet(fieldType)) {
                 DeclaredType declaredType = (DeclaredType) fieldType;
@@ -128,51 +139,79 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                     TypeMirror genericType = declaredType.getTypeArguments().get(0);
                     TypeElement genericElement = (TypeElement) processingEnv.getTypeUtils().asElement(genericType);
                     GenerateDto genDto = genericElement.getAnnotation(GenerateDto.class);
-                    if (genDto == null) { continue; }
-                    String name = getDtoName(genericElement, genDto);
-                    if (isList(fieldType)) {
-                        type = useCollection(JAVA_UTIL_LIST, name, imports);
-                    } else if (isSet(fieldType)) {
-                        type = useCollection(JAVA_UTIL_SET, name, imports);
+                    if (genDto != null) {
+                        String name = getDtoName(genericElement, genDto);
+                        String fqn = genDto.dtoPackage().concat(".").concat(name);
+                        if (isList(fieldType)) {
+                            type = useCollection(JAVA_UTIL_LIST, fqn, imports);
+                        } else {
+                            type = useCollection(JAVA_UTIL_SET, fqn, imports);
+                        }
+                    } else {
+                        type = useCollection(JAVA_UTIL_LIST, genericElement.getQualifiedName().toString(), imports);
                     }
+                } else {
+                    type = useType(fieldType, imports, config.usePrimitives());
                 }
+            } else {
+                type = useType(fieldType, imports, config.usePrimitives());
             }
             properties.add(new Property(order++, type, finalName));
         }
     }
     private static String getDtoName(TypeElement entity, GenerateDto config) {
-        String entityName = entity.getSimpleName().toString();
+        String entityName = nonPrimitives(entity, config.usePrimitives());
         return config.name().isEmpty() ? entityName + config.suffix() : config.name();
     }
     private boolean isList(TypeMirror type) {
-        try {
-            return processingEnv.getTypeUtils().isAssignable(type, elements.getTypeElement(JAVA_UTIL_LIST).asType());
-        } catch (Exception e) {
-            if (!(type instanceof DeclaredType)) { return false; }
-            String raw = ((DeclaredType) type).asElement().toString();
-            return raw.equals(JAVA_UTIL_LIST);
-        }
+        if (!(type instanceof DeclaredType)) { return false; }
+        String raw = ((DeclaredType) type).asElement().toString();
+        return raw.equals(JAVA_UTIL_LIST);
     }
     private boolean isSet(TypeMirror type) {
-        try {
-            return processingEnv.getTypeUtils().isAssignable(type, elements.getTypeElement(JAVA_UTIL_SET).asType());
-        } catch (Exception e) {
-            if (!(type instanceof DeclaredType)) { return false; }
-            String raw = ((DeclaredType) type).asElement().toString();
-            return raw.equals(JAVA_UTIL_SET);
-        }
+        if (!(type instanceof DeclaredType)) { return false; }
+        String raw = ((DeclaredType) type).asElement().toString();
+        return raw.equals(JAVA_UTIL_SET);
     }
-    private String useType(TypeMirror type, Set<String> imports) {
+    private String useType(TypeMirror type, Set<String> imports, boolean nonPrimitives) {
         if (!(type instanceof DeclaredType)) { return type.toString(); }
         TypeElement element = (TypeElement) ((DeclaredType) type).asElement();
         String fqcn = element.getQualifiedName().toString();
         // No importes java.lang
         if (!fqcn.startsWith("java.lang")) { imports.add(fqcn); }
-        return element.getSimpleName().toString();
+        return nonPrimitives(element, nonPrimitives);
+    }
+    private static String nonPrimitives(TypeElement element, boolean usePrimitives) {
+        String type = element.getSimpleName().toString();
+        if (!usePrimitives && typeIsPrimitive(type)) {
+            switch (type) {
+                case "boolean":
+                    return Boolean.class.getSimpleName();
+                case "byte":
+                    return Byte.class.getSimpleName();
+                case "char":
+                    return Character.class.getSimpleName();
+                case "double":
+                    return Double.class.getSimpleName();
+                case "float":
+                    return Float.class.getSimpleName();
+                case "int":
+                    return Integer.class.getSimpleName();
+                case "long":
+                    return Long.class.getSimpleName();
+                case "short":
+                    return Short.class.getSimpleName();
+            }
+        }
+        return type;
+    }
+    private static boolean typeIsPrimitive(String type) {
+        return type.equals("boolean") || type.equals("byte") || type.equals("char") || type.equals("double")
+                || type.equals("float") || type.equals("int") || type.equals("long") || type.equals("short");
     }
     private String useCollection(String collectionFqn, String genericFqn, Set<String> imports) {
         imports.add(collectionFqn);
-        imports.add(genericFqn);
+        if (!genericFqn.startsWith("java.lang")) { imports.add(genericFqn); }
         String collectionSimple = collectionFqn.substring(collectionFqn.lastIndexOf('.') + 1);
         String genericSimple = genericFqn.substring(genericFqn.lastIndexOf('.') + 1);
         return collectionSimple + "<" + genericSimple + ">";

@@ -74,7 +74,7 @@ publishing {
     publications {
         register<MavenPublication>("release") {
             artifactId = "kore"
-            version = "1.0.29"
+            version = "1.0.30"
 
             afterEvaluate {
                 from(components["release"])
