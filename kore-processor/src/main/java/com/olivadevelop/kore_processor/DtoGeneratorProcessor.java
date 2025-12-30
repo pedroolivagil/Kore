@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -143,14 +144,22 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         return config.name().isEmpty() ? entityName + config.suffix() : config.name();
     }
     private boolean isList(TypeMirror type) {
-        if (!(type instanceof DeclaredType)) { return false; }
-        String raw = ((DeclaredType) type).asElement().toString();
-        return raw.equals(JAVA_UTIL_LIST);
+        try {
+            return processingEnv.getTypeUtils().isAssignable(type, elements.getTypeElement(JAVA_UTIL_LIST).asType());
+        } catch (Exception e) {
+            if (!(type instanceof DeclaredType)) { return false; }
+            String raw = ((DeclaredType) type).asElement().toString();
+            return raw.equals(JAVA_UTIL_LIST);
+        }
     }
     private boolean isSet(TypeMirror type) {
-        if (!(type instanceof DeclaredType)) { return false; }
-        String raw = ((DeclaredType) type).asElement().toString();
-        return raw.equals(JAVA_UTIL_SET);
+        try {
+            return processingEnv.getTypeUtils().isAssignable(type, elements.getTypeElement(JAVA_UTIL_SET).asType());
+        } catch (Exception e) {
+            if (!(type instanceof DeclaredType)) { return false; }
+            String raw = ((DeclaredType) type).asElement().toString();
+            return raw.equals(JAVA_UTIL_SET);
+        }
     }
     private String useType(TypeMirror type, Set<String> imports) {
         if (!(type instanceof DeclaredType)) { return type.toString(); }
@@ -168,13 +177,24 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         return collectionSimple + "<" + genericSimple + ">";
     }
     private static class Property {
-        private Integer order;
-        private String type;
-        private String property;
+        private final Integer order;
+        private final String type;
+        private final String property;
         public Property(Integer order, String type, String property) {
             this.order = order;
             this.type = type;
             this.property = property;
+        }
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { return true; }
+            if (o == null || getClass() != o.getClass()) { return false; }
+            Property property1 = (Property) o;
+            return Objects.equals(order, property1.order) && Objects.equals(type, property1.type) && Objects.equals(property, property1.property);
+        }
+        @Override
+        public int hashCode() {
+            return Objects.hash(order, type, property);
         }
     }
 }
