@@ -6,18 +6,20 @@ java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
 }
+
 dependencies {
     implementation(project(":kore-annotations"))
     implementation("com.google.auto.service:auto-service-annotations:1.1.1")
     implementation("com.google.auto.service:auto-service:1.1.1")
     annotationProcessor("com.google.auto.service:auto-service:1.1.1")
+    compileOnly(libs.lombok)
 }
 
 publishing {
     publications {
         register<MavenPublication>("release") {
             artifactId = "kore-processor"
-            version = "1.0.25"
+            version = "1.0.26"
 
             from(components["java"])
         }

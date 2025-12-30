@@ -11,7 +11,7 @@ publishing {
     publications {
         register<MavenPublication>("release") {
             artifactId = "kore-annotations"
-            version = "1.0.25"
+            version = "1.0.26"
 
             from(components["java"])
         }
