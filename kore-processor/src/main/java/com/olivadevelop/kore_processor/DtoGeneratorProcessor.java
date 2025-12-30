@@ -65,14 +65,17 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         String dtoName = getDtoName(entity, config);
         String pkg = config.dtoPackage();
         Set<String> imports = new HashSet<>();
-        imports.add(config.dtoPackage());
         Set<Property> properties = new HashSet<>();
         calculateClass(entity, config, imports, properties);
         final StringBuilder sb = new StringBuilder();
         sb.append("package ").append(pkg).append(SEMICOLON).append(LINE_BREAK_DOUBLE);
         imports.stream()
-                .filter(i -> !i.equalsIgnoreCase(config.dtoPackage()))
                 .sorted().forEach(i -> sb.append("import ").append(i).append(SEMICOLON).append(LINE_BREAK));
+        sb.append(LINE_BREAK);
+        sb.append("@Builder").append(LINE_BREAK);
+        sb.append("@Data").append(LINE_BREAK);
+        sb.append("@NoArgsConstructor").append(LINE_BREAK);
+        sb.append("@AllArgsConstructor").append(LINE_BREAK);
         sb.append("public class ").append(dtoName).append(" extends KoreDTO {").append(LINE_BREAK);
         properties.stream()
                 .sorted(Comparator.comparing(p -> p.order))
@@ -124,11 +127,11 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                     TypeElement genericElement = (TypeElement) processingEnv.getTypeUtils().asElement(genericType);
                     GenerateDto genDto = genericElement.getAnnotation(GenerateDto.class);
                     if (genDto == null) { continue; }
-                    finalName = getDtoName(genericElement, genDto);
+                    String name = getDtoName(genericElement, genDto);
                     if (isList(fieldType)) {
-                        type = useCollection(JAVA_UTIL_LIST, genericElement.getQualifiedName().toString(), imports);
+                        type = useCollection(JAVA_UTIL_LIST, name, imports);
                     } else if (isSet(fieldType)) {
-                        type = useCollection(JAVA_UTIL_SET, genericElement.getQualifiedName().toString(), imports);
+                        type = useCollection(JAVA_UTIL_SET, name, imports);
                     }
                 }
             }
