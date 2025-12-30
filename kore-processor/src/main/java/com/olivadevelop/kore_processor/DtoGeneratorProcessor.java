@@ -54,6 +54,7 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        if (roundEnv.processingOver()) { return false; }
         for (Element element : roundEnv.getElementsAnnotatedWith(GenerateDto.class)) {
             if (element.getKind() != ElementKind.CLASS) { continue; }
             TypeElement entity = (TypeElement) element;
