@@ -17,6 +17,7 @@ import javax.annotation.processing.Filer;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.Processor;
 import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
@@ -31,16 +32,11 @@ import javax.tools.JavaFileObject;
 
 @AutoService(Processor.class)
 @SupportedSourceVersion(SourceVersion.RELEASE_11)
+@SupportedOptions("kore.version")
 public class DtoGeneratorProcessor extends AbstractProcessor {
-
-    public static final String COM_OLIVADEVELOP_KORE_DB_DTO_KORE_DTO = "com.olivadevelop.kore.db.dto.KoreDTO";
-    public static final String JAVA_UTIL_LIST = "java.util.List";
-    public static final String JAVA_UTIL_SET = "java.util.Set";
-    public static final String SEMICOLON = ";";
-    public static final String LINE_BREAK_DOUBLE = "\n\n";
-    public static final String LINE_BREAK = "\n";
     private Filer filer;
     private Elements elements;
+    private String koreVersion;
     @Override
     public Set<String> getSupportedAnnotationTypes() {
         return Set.of(GenerateDto.class.getCanonicalName());
@@ -51,6 +47,8 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         super.init(env);
         filer = env.getFiler();
         elements = env.getElementUtils();
+        koreVersion = env.getOptions().get("kore.version");
+        if (koreVersion == null) { koreVersion = "unknown"; }
     }
 
     @Override
@@ -71,18 +69,18 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         Set<Property> properties = new HashSet<>();
         calculateClass(entity, config, imports, properties);
         final StringBuilder sb = new StringBuilder();
-        sb.append("package ").append(pkg).append(SEMICOLON).append(LINE_BREAK_DOUBLE);
-        imports.stream().sorted().forEach(i -> sb.append("import ").append(i).append(SEMICOLON).append(LINE_BREAK));
-        sb.append(LINE_BREAK);
-        sb.append("@Builder").append(LINE_BREAK);
-        sb.append("@Data").append(LINE_BREAK);
-        sb.append("@NoArgsConstructor").append(LINE_BREAK);
-        sb.append("@AllArgsConstructor").append(LINE_BREAK);
-        sb.append("@EqualsAndHashCode(callSuper = true)").append(LINE_BREAK);
-        sb.append("@Generated(value = \"").append(entity.getSimpleName()).append(".class\", date = \"").append(getCurrentDate()).append("\", comments = \"").append(getComment()).append("\")").append(LINE_BREAK);
-        sb.append("public class ").append(dtoName).append(" extends KoreDTO {").append(LINE_BREAK);
-        properties.stream().sorted(Comparator.comparing(p -> p.order)).forEach(p -> sb.append("    private ").append(p.type).append(" ").append(p.property).append(SEMICOLON).append(LINE_BREAK));
-        sb.append("}").append(LINE_BREAK);
+        sb.append("package ").append(pkg).append(Params.SEMICOLON).append(Params.LINE_BREAK_DOUBLE);
+        imports.stream().sorted().forEach(i -> sb.append("import ").append(i).append(Params.SEMICOLON).append(Params.LINE_BREAK));
+        sb.append(Params.LINE_BREAK);
+        sb.append("@Builder").append(Params.LINE_BREAK);
+        sb.append("@Data").append(Params.LINE_BREAK);
+        sb.append("@NoArgsConstructor").append(Params.LINE_BREAK);
+        sb.append("@AllArgsConstructor").append(Params.LINE_BREAK);
+        sb.append("@EqualsAndHashCode(callSuper = true)").append(Params.LINE_BREAK);
+        sb.append("@Generated(value = \"").append(entity.getSimpleName()).append(".class\", date = \"").append(getCurrentDate()).append("\", comments = \"").append(getComment()).append("\")").append(Params.LINE_BREAK);
+        sb.append("public class ").append(dtoName).append(" extends KoreDTO {").append(Params.LINE_BREAK);
+        properties.stream().sorted(Comparator.comparing(p -> p.order)).forEach(p -> sb.append("    private ").append(p.type).append(" ").append(p.property).append(Params.SEMICOLON).append(Params.LINE_BREAK));
+        sb.append("}").append(Params.LINE_BREAK);
         try {
             JavaFileObject file = filer.createSourceFile(pkg + "." + dtoName);
             try (Writer writer = file.openWriter()) { writer.write(sb.toString()); }
@@ -90,9 +88,7 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
             throw new RuntimeException(e);
         }
     }
-    private static String getComment() {
-        return "DTO Generated from version 1.30";
-    }
+    private String getComment() { return "DTO Generated from version: " + koreVersion; }
     private String getCurrentDate() {
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, d MMMM, yyyy - HH:mm:ss", java.util.Locale.getDefault());
         return sdf.format(new java.util.Date());
@@ -104,7 +100,7 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         imports.add(lombok.AllArgsConstructor.class.getCanonicalName());
         imports.add(lombok.EqualsAndHashCode.class.getCanonicalName());
         imports.add(javax.annotation.processing.Generated.class.getCanonicalName());
-        imports.add(COM_OLIVADEVELOP_KORE_DB_DTO_KORE_DTO);
+        imports.add(Params.COM_OLIVADEVELOP_KORE_DB_DTO_KORE_DTO);
         int order = 0;
         for (Element field : entity.getEnclosedElements()) {
             if (field.getKind() != ElementKind.FIELD) { continue; }
@@ -123,9 +119,9 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                 if (!dtoField.name().isEmpty()) { finalName = dtoField.name(); }
                 if (dtoField.type() != null && dtoField.type() != void.class) {
                     if (isList(fieldType)) {
-                        type = useCollection(JAVA_UTIL_LIST, dtoField.type().getCanonicalName(), imports);
+                        type = useCollection(Params.JAVA_UTIL_LIST, dtoField.type().getCanonicalName(), imports);
                     } else if (isSet(fieldType)) {
-                        type = useCollection(JAVA_UTIL_SET, dtoField.type().getCanonicalName(), imports);
+                        type = useCollection(Params.JAVA_UTIL_SET, dtoField.type().getCanonicalName(), imports);
                     } else {
                         type = dtoField.type().getSimpleName();
                         imports.add(dtoField.type().getCanonicalName());
@@ -143,12 +139,12 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                         String name = getDtoName(genericElement, genDto);
                         String fqn = genDto.dtoPackage().concat(".").concat(name);
                         if (isList(fieldType)) {
-                            type = useCollection(JAVA_UTIL_LIST, fqn, imports);
+                            type = useCollection(Params.JAVA_UTIL_LIST, fqn, imports);
                         } else {
-                            type = useCollection(JAVA_UTIL_SET, fqn, imports);
+                            type = useCollection(Params.JAVA_UTIL_SET, fqn, imports);
                         }
                     } else {
-                        type = useCollection(JAVA_UTIL_LIST, genericElement.getQualifiedName().toString(), imports);
+                        type = useCollection(Params.JAVA_UTIL_LIST, genericElement.getQualifiedName().toString(), imports);
                     }
                 } else {
                     type = useType(fieldType, imports, config.usePrimitives());
@@ -166,12 +162,12 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
     private boolean isList(TypeMirror type) {
         if (!(type instanceof DeclaredType)) { return false; }
         String raw = ((DeclaredType) type).asElement().toString();
-        return raw.equals(JAVA_UTIL_LIST);
+        return raw.equals(Params.JAVA_UTIL_LIST);
     }
     private boolean isSet(TypeMirror type) {
         if (!(type instanceof DeclaredType)) { return false; }
         String raw = ((DeclaredType) type).asElement().toString();
-        return raw.equals(JAVA_UTIL_SET);
+        return raw.equals(Params.JAVA_UTIL_SET);
     }
     private String useType(TypeMirror type, Set<String> imports, boolean nonPrimitives) {
         if (!(type instanceof DeclaredType)) { return type.toString(); }

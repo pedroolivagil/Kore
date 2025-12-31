@@ -70,11 +70,17 @@ dependencies {
     implementation(libs.mpandroidchart)
 }
 
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs.add(
+        "-Akore.version=$version"
+    )
+}
+
 publishing {
     publications {
         register<MavenPublication>("release") {
             artifactId = "kore"
-            version = "1.0.30"
+            version = rootProject.version.toString()
 
             afterEvaluate {
                 from(components["release"])

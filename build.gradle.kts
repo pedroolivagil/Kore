@@ -2,3 +2,6 @@
 plugins {
     alias(libs.plugins.android.application) apply false
 }
+allprojects {
+    version = property("koreVersion") as String
+}

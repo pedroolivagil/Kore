@@ -19,7 +19,7 @@ public class SnackbarBuilder {
     private final Context context;
 
     private CharSequence message;
-    private int duration = Snackbar.LENGTH_LONG;
+    private int duration; // 0 = Snackbar.LENGTH_LONG
 
     private CharSequence actionText;
     private View.OnClickListener actionListener;
