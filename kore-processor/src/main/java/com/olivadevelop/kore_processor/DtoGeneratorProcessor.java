@@ -150,13 +150,14 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                     type = useType(fieldType, imports, config.usePrimitives());
                 }
             } else {
+                // No es una lista ni un set, ni contine la anotacion dtoField
                 type = useType(fieldType, imports, config.usePrimitives());
             }
             properties.add(new Property(order++, type, finalName));
         }
     }
     private static String getDtoName(TypeElement entity, GenerateDto config) {
-        String entityName = nonPrimitives(entity, config.usePrimitives());
+        String entityName = entity.getSimpleName().toString();
         return config.name().isEmpty() ? entityName + config.suffix() : config.name();
     }
     private boolean isList(TypeMirror type) {
@@ -169,41 +170,42 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         String raw = ((DeclaredType) type).asElement().toString();
         return raw.equals(Params.JAVA_UTIL_SET);
     }
-    private String useType(TypeMirror type, Set<String> imports, boolean nonPrimitives) {
-        if (!(type instanceof DeclaredType)) { return type.toString(); }
-        TypeElement element = (TypeElement) ((DeclaredType) type).asElement();
-        String fqcn = element.getQualifiedName().toString();
-        // No importes java.lang
-        if (!fqcn.startsWith("java.lang")) { imports.add(fqcn); }
-        return nonPrimitives(element, nonPrimitives);
-    }
-    private static String nonPrimitives(TypeElement element, boolean usePrimitives) {
-        String type = element.getSimpleName().toString();
-        if (!usePrimitives && typeIsPrimitive(type)) {
-            switch (type) {
-                case "boolean":
+    private String useType(TypeMirror type, Set<String> imports, boolean usePrimitives) {
+        if (type.getKind().isPrimitive()) { // int, boolean, etc.
+            if (usePrimitives) { return type.toString(); }
+            switch (type.getKind()) {
+                case BOOLEAN:
                     return Boolean.class.getSimpleName();
-                case "byte":
+                case BYTE:
                     return Byte.class.getSimpleName();
-                case "char":
+                case CHAR:
                     return Character.class.getSimpleName();
-                case "double":
+                case DOUBLE:
                     return Double.class.getSimpleName();
-                case "float":
+                case FLOAT:
                     return Float.class.getSimpleName();
-                case "int":
+                case INT:
                     return Integer.class.getSimpleName();
-                case "long":
+                case LONG:
                     return Long.class.getSimpleName();
-                case "short":
+                case SHORT:
                     return Short.class.getSimpleName();
+                default:
+                    return type.toString();
             }
         }
-        return type;
-    }
-    private static boolean typeIsPrimitive(String type) {
-        return type.equals("boolean") || type.equals("byte") || type.equals("char") || type.equals("double")
-                || type.equals("float") || type.equals("int") || type.equals("long") || type.equals("short");
+        if (!(type instanceof DeclaredType)) { return type.toString(); }
+        TypeElement element = (TypeElement) ((DeclaredType) type).asElement();
+        GenerateDto config = element.getAnnotation(GenerateDto.class);
+        if (config == null) {
+            String fqcn = element.getQualifiedName().toString();
+            // No importes java.lang
+            if (!fqcn.startsWith("java.lang")) { imports.add(fqcn); }
+            return element.getSimpleName().toString();
+        } else {
+            imports.add(config.dtoPackage());
+            return getDtoName(element, config);
+        }
     }
     private String useCollection(String collectionFqn, String genericFqn, Set<String> imports) {
         imports.add(collectionFqn);
