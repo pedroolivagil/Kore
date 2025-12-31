@@ -203,8 +203,10 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
             if (!fqcn.startsWith("java.lang")) { imports.add(fqcn); }
             return element.getSimpleName().toString();
         } else {
-            imports.add(config.dtoPackage());
-            return getDtoName(element, config);
+            String name = getDtoName(element, config);
+            String fqn = config.dtoPackage().concat(".").concat(name);
+            imports.add(fqn);
+            return name;
         }
     }
     private String useCollection(String collectionFqn, String genericFqn, Set<String> imports) {
