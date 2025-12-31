@@ -92,8 +92,7 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
         EdgeToEdge.enable(this);
         setContentView(binding.getRoot());
         ViewCompat.setOnApplyWindowInsetsListener(getBinding().getRoot(), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0);
+            setSystemBarsInsets(v, insets);
             return insets;
         });
         init(savedInstanceState);
@@ -111,6 +110,10 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
             @Override
             public void handleOnBackPressed() { handleBackPress(); }
         });
+    }
+    protected void setSystemBarsInsets(View v, WindowInsetsCompat insets) {
+        Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+        v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
     }
     @Override
     protected void onPostResume() {
