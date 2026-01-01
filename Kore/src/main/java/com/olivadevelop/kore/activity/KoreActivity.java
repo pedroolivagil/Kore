@@ -110,6 +110,7 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
             @Override
             public void handleOnBackPressed() { handleBackPress(); }
         });
+        initListeners();
     }
     protected void setSystemBarsInsets(View v, WindowInsetsCompat insets) {
         Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -154,6 +155,7 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
     protected void validations() { }
     protected void validateFailed() { }
     public final View getRoot() { return binding.getRoot(); }
+    protected final void addClickListener(View v) { if (v != null) { v.setOnClickListener(this); } }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
