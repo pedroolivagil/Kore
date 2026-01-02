@@ -381,7 +381,8 @@ public abstract class Utils {
             Type type = obj.getClass().getGenericSuperclass();
             Class<T> objClass = null;
             if (type instanceof Class) {
-                objClass = (Class<T>) ((ParameterizedType) Objects.requireNonNull(((Class<?>) obj.getClass().getGenericSuperclass()).getGenericSuperclass())).getActualTypeArguments()[indexParam];
+                objClass =
+                        (Class<T>) ((ParameterizedType) Objects.requireNonNull(((Class<?>) obj.getClass().getGenericSuperclass()).getGenericSuperclass())).getActualTypeArguments()[indexParam];
             } else if (type instanceof ParameterizedType) {
                 objClass = (Class<T>) ((ParameterizedType) type).getActualTypeArguments()[indexParam];
             }

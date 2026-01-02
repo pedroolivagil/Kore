@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/rounded_background_8_stroke_pink_light"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/wrapper_color_max"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:baselineAligned="false"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:minHeight="48dp"
+                        android:orientation="vertical">
+
+                        <com.skydoves.colorpickerview.ColorPickerView
+                            android:id="@+id/color_picker_preview"
+                            android:layout_width="match_parent"
+                            android:layout_height="256dp"
+                            android:layout_margin="@dimen/generic_panel_margin_full"
+                            app:flag_alpha="1"
+                            app:flag_isFlipAble="false"
+                            app:selector="50"
+                            app:selector_alpha=".8"
+                            app:selector_size="10dp" />
+
+                        <com.skydoves.colorpickerview.sliders.BrightnessSlideBar
+                            android:id="@+id/brightness_slide"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="@dimen/generic_panel_margin_full"
+                            android:layout_marginBottom="@dimen/generic_panel_margin_full"
+                            app:borderColor_BrightnessSlider="@color/pink_gray_light"
+                            app:borderSize_BrightnessSlider="0"
+                            app:selector_BrightnessSlider="@drawable/colorpickerview_wheel" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:minHeight="48dp"
+                        android:orientation="vertical">
+
+                        <ImageButton
+                            android:id="@+id/btn_collapse"
+                            style="@style/Theme.Kore.ImageButton.Top"
+                            android:contentDescription="@string/content_description_collapse"
+                            app:srcCompat="@drawable/ic_collapse" />
+
+                        <ImageButton
+                            android:id="@+id/btn_preview_gallery"
+                            style="@style/Theme.Kore.ImageButtonBase"
+                            android:contentDescription="@string/content_description_preview_gallery"
+                            app:srcCompat="@drawable/ic_img" />
+
+                        <ImageButton
+                            android:id="@+id/btn_preview_camera"
+                            style="@style/Theme.Kore.ImageButtonBase"
+                            android:contentDescription="@string/content_description_preview_camera"
+                            app:srcCompat="@drawable/ic_camera" />
+
+                        <ImageButton
+                            android:id="@+id/btn_reset_color"
+                            style="@style/Theme.Kore.ImageButtonBase"
+                            android:contentDescription="@string/content_description_reset"
+                            android:visibility="gone"
+                            app:srcCompat="@drawable/ic_reload_inverse" />
+
+                        <ImageButton
+                            android:id="@+id/btn_clear_image"
+                            style="@style/Theme.Kore.ImageButtonBase"
+                            android:contentDescription="@string/content_description_clear"
+                            android:visibility="gone"
+                            app:srcCompat="@drawable/ic_error_clear" />
+
+                        <View
+                            android:id="@+id/color_preview"
+                            style="@style/Theme.Kore.ImageButton.Bottom"
+                            android:layout_marginBottom="@dimen/margin_between_components_form_min"
+                            android:layout_weight="1" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/wrapper_color_min"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="end"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/color_preview_minimized"
+                        style="@style/Theme.Kore.ImageButton.Left"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:contentDescription="@string/content_description_minimized"
+                        android:scaleType="centerCrop" />
+
+                    <ImageButton
+                        android:id="@+id/btn_open_component"
+                        style="@style/Theme.Kore.ImageButton.Right"
+                        android:contentDescription="@string/btn_take_photo_from_camera"
+                        app:srcCompat="@drawable/ic_expand" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/required_warning_label"
+                style="@style/Theme.Kore.FieldRequiredText"
+                android:text="@string/field_required" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/margin_between_components_form_min" />
+        </LinearLayout>
+
+        <include
+            android:id="@+id/disabled_view"
+            layout="@layout/disabled_overlay"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.5" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</merge>

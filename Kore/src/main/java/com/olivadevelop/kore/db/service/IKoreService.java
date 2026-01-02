@@ -4,6 +4,7 @@ import com.olivadevelop.kore.db.dto.KoreDTO;
 import com.olivadevelop.kore.db.entity.KoreEntity;
 
 import java.util.List;
+
 @Deprecated
 public interface IKoreService<D extends KoreDTO<V>, V extends KoreEntity, K> {
     D findOne(K key);

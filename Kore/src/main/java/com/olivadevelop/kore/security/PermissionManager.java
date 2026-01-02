@@ -24,9 +24,11 @@ public class PermissionManager<T extends PermissionContract> {
         }
         if (!needed.isEmpty()) { ActivityCompat.requestPermissions(activity, needed.toArray(new String[0]), REQUEST_CODE); }
     }
-//    @SafeVarargs
+    //    @SafeVarargs
     public final boolean areGranted(PermissionContract... permissions) {
-        for (PermissionContract p : permissions) { if (ContextCompat.checkSelfPermission(activity, p.getValue()) != PackageManager.PERMISSION_GRANTED) { return false; } }
+        for (PermissionContract p : permissions) {
+            if (ContextCompat.checkSelfPermission(activity, p.getValue()) != PackageManager.PERMISSION_GRANTED) { return false; }
+        }
         return true;
     }
 }

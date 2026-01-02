@@ -15,13 +15,13 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
 
+import com.olivadevelop.kore.R;
 import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.annotation.RegularExpressionField;
+import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
 import com.olivadevelop.kore.preferences.PreferenceField;
 import com.olivadevelop.kore.util.AutoCalculateFormulaData;
 import com.olivadevelop.kore.util.Utils;
-import com.olivadevelop.kore.R;
-import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -138,11 +138,14 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     public void onClick(View v) { }
     @Override
     public boolean onTouch(View v, MotionEvent event) { return false; }
-    protected abstract void init(Context context, @Nullable AttributeSet attrs);
-    protected abstract DisabledOverlayBinding getDisabledOverlay();
+    protected void init(Context context, @Nullable AttributeSet attrs) { }
     protected void configureFromLayout(ComponentAttributes c) { }
-    protected void previewEditMode(ComponentAttributes c) { }
+    protected void previewEditMode(ComponentAttributes c) { configureFromLayout(c); }
+    protected DisabledOverlayBinding getDisabledOverlay() { return null; }
+    protected View getRequiredViewWarning() { return null; }
+    public Object getValue() { return null; }
     public void setValue(Object s) { }
+    public void clearValue() { }
     public void setHint(String hint) { }
     public void setMaxLines(int maxLines) { }
     public void setMaxLength(int maxLength) { }
@@ -150,43 +153,45 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     public String getText() { return null; }
     public String getHint() { return null; }
     protected EditText editTextToValidate() { return null; }
-    protected void whesRegexIsNotValid() { }
+    protected void whenRegexIsNotValid() { }
     protected void whenRegexIsValid() { }
     protected void whenBeforeTextChanged(CharSequence s, int start, int count, int after) { }
     protected void whenOnTextChanged(CharSequence s, int start, int before, int count) { }
     protected void whenAfterTextChanged(Editable e) { }
     protected void addOnClickListenerToView(View v) { v.setOnClickListener(this); }
     protected void addOnTouchListenerToView(View v) { v.setOnTouchListener(this); }
-    private void validateInput() { if (isValid()) { whenRegexIsValid(); } else { whesRegexIsNotValid(); } }
+    private void validateInput() { if (isValid()) { whenRegexIsValid(); } else { whenRegexIsNotValid(); } }
     private void processAttrs(Context context, AttributeSet attrs) {
         int defaultTextStyle = 0;
         float defaultTextSize = 16f;
         int defaultTextColor = context.getResources().getColor(R.color.text_primary, context.getTheme());
-//        if (isInEditMode()) {
-//            String namespace = "http://schemas.android.com/app";
-//            ComponentAttributes.ComponentAttributesBuilder cb = ComponentAttributes.builder()
-//                    .checked(ComponentAttributes.getBoolean(attrs, namespace, "checked", false))
-//                    .enabled(ComponentAttributes.getBoolean(attrs, namespace, "enabled", true))
-//                    .preferenceKey(attrs.getAttributeValue(namespace, "preferenceKey"))
-//                    .preferenceType(attrs.getAttributeIntValue(R.styleable.BasicComponentView_preferenceType, -1))
-//                    .subtitle(attrs.getAttributeValue(namespace, "subtitle"))
-//                    .textColor(ComponentAttributes.getInt(attrs, namespace, "textColor", defaultTextColor))
-//                    .textSize(ComponentAttributes.getFloat(attrs, namespace, "textSize", defaultTextSize))
-//                    .textStyle(ComponentAttributes.getInt(attrs, namespace, "textStyle", defaultTextStyle))
-//                    .title(attrs.getAttributeValue(namespace, "title"))
-//                    .value(attrs.getAttributeValue(namespace, "value"))
-//                    .valueProperties(attrs.getAttributeValue(namespace, "valueProperties"))
-//                    .valueTextColor(ComponentAttributes.getInt(attrs, namespace, "valueTextColor", defaultTextColor))
-//                    .valueTextSize(ComponentAttributes.getFloat(attrs, namespace, "valueTextSize", defaultTextSize))
-//                    .valueTextStyle(ComponentAttributes.getInt(attrs, namespace, "valueTextStyle", defaultTextStyle));
-//            if (cb.valueProperties != null && cb.valueProperties.isEmpty()) {
-//                String[] properties = cb.valueProperties.split(";");
-//                if (cb.value.contains("%s") && properties.length > 0) {
-//                    cb.valuePropertyProcessed(Utils.Reflex.processAllValueProperties(getActivity(), properties));
-//                }
-//            }
-//            previewEditMode(cb.build());
-//        }
+        int defaultBorderColor = context.getResources().getColor(R.color.gray, context.getTheme());
+        if (isInEditMode()) {
+            String namespace = "http://schemas.android.com/app";
+            ComponentAttributes.ComponentAttributesBuilder cb = ComponentAttributes.builder()
+                    .checked(ComponentAttributes.getBoolean(attrs, namespace, "checked", false))
+                    .enabled(ComponentAttributes.getBoolean(attrs, namespace, "enabled", true))
+                    .preferenceKey(attrs.getAttributeValue(namespace, "preferenceKey"))
+                    .preferenceType(attrs.getAttributeIntValue(R.styleable.BasicComponentView_preferenceType, -1))
+                    .subtitle(attrs.getAttributeValue(namespace, "subtitle"))
+                    .borderColor(ComponentAttributes.getInt(attrs, namespace, "borderColor", defaultBorderColor))
+                    .textColor(ComponentAttributes.getInt(attrs, namespace, "textColor", defaultTextColor))
+                    .textSize(ComponentAttributes.getFloat(attrs, namespace, "textSize", defaultTextSize))
+                    .textStyle(ComponentAttributes.getInt(attrs, namespace, "textStyle", defaultTextStyle))
+                    .title(attrs.getAttributeValue(namespace, "title"))
+                    .value(attrs.getAttributeValue(namespace, "value"))
+                    .valueProperties(attrs.getAttributeValue(namespace, "valueProperties"))
+                    .valueTextColor(ComponentAttributes.getInt(attrs, namespace, "valueTextColor", defaultTextColor))
+                    .valueTextSize(ComponentAttributes.getFloat(attrs, namespace, "valueTextSize", defaultTextSize))
+                    .valueTextStyle(ComponentAttributes.getInt(attrs, namespace, "valueTextStyle", defaultTextStyle));
+            if (cb.valueProperties != null && cb.valueProperties.isEmpty()) {
+                String[] properties = cb.valueProperties.split(";");
+                if (cb.value.contains("%s") && properties.length > 0) {
+                    cb.valuePropertyProcessed(Utils.Reflex.processAllValueProperties(getActivity(), properties));
+                }
+            }
+            previewEditMode(cb.build());
+        }
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BasicComponentView);
         ComponentAttributes.ComponentAttributesBuilder cb = ComponentAttributes.builder()
                 .checked(a.getBoolean(R.styleable.BasicComponentView_checked, false))
@@ -194,6 +199,7 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
                 .preferenceKey(a.getString(R.styleable.BasicComponentView_preferenceKey))
                 .preferenceType(a.getInt(R.styleable.BasicComponentView_preferenceType, -1))
                 .subtitle(a.getString(R.styleable.BasicComponentView_subtitle))
+                .borderColor(a.getColor(R.styleable.BasicComponentView_borderColor, defaultBorderColor))
                 .textColor(a.getColor(R.styleable.BasicComponentView_textColor, defaultTextColor))
                 .textSize(a.getDimension(R.styleable.BasicComponentView_textSize, defaultTextSize))
                 .textStyle(a.getInt(R.styleable.BasicComponentView_textStyle, defaultTextStyle))
@@ -236,6 +242,7 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         private final String preferenceKey;
         private final int preferenceType;
         private final String title;
+        private final int borderColor;
         private final int textColor;
         private final float textSize;
         private final int textStyle;

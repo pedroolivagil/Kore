@@ -7,7 +7,6 @@ import androidx.annotation.Dimension;
 import androidx.annotation.Nullable;
 
 import com.olivadevelop.kore.databinding.CompButtonRowBinding;
-import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
 
 public class CustomButtonRowView extends KoreComponentView<CompButtonRowBinding> {
 
@@ -21,25 +20,7 @@ public class CustomButtonRowView extends KoreComponentView<CompButtonRowBinding>
         });
     }
     @Override
-    protected DisabledOverlayBinding getDisabledOverlay() { return null; }
-
-    @Override
     public void setValue(Object s) { if (s != null) { setValue(String.valueOf(s)); } }
-    @Override
-    protected void previewEditMode(ComponentAttributes c) {
-        if (c.getTitle() != null) {
-            getBinding().txtTitle.setText(c.getTitle());
-            getBinding().txtTitle.setTextColor(c.getTextColor());
-            getBinding().txtTitle.setTypeface(getBinding().txtTitle.getTypeface(), c.getTextStyle());
-            getBinding().txtTitle.setTextSize(Dimension.SP, c.getTextSize());
-        }
-        if (c.getSubtitle() != null) {
-            getBinding().txtSubtitle.setText(c.getSubtitle());
-            getBinding().txtSubtitle.setTextColor(c.getValueTextColor());
-            getBinding().txtSubtitle.setTypeface(getBinding().txtSubtitle.getTypeface(), c.getValueTextStyle());
-            getBinding().txtSubtitle.setTextSize(Dimension.SP, c.getValueTextSize());
-        }
-    }
     @Override
     protected void configureFromLayout(ComponentAttributes c) {
         if (c.getTitle() != null) {

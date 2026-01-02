@@ -4,7 +4,7 @@
         <attr name="checked" format="boolean" />
         <attr name="enabled" format="boolean" />
         <attr name="preferenceKey" format="string" />
-        <attr name="preferenceType" format="enum" >
+        <attr name="preferenceType" format="enum">
             <enum name="type_boolean" value="0" />
             <enum name="type_float" value="1" />
             <enum name="type_integer" value="2" />
@@ -14,6 +14,7 @@
             <enum name="type_object" value="6" />
         </attr>
         <attr name="subtitle" format="string" />
+        <attr name="borderColor" format="color" />
         <attr name="textColor" format="color" />
         <attr name="textSize" format="dimension" />
         <attr name="textStyle" format="enum">

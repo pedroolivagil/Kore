@@ -27,9 +27,11 @@ preference = "1.2.1"
 workRuntime = "2.10.0"
 activity = "1.10.1"
 legacySupportV4 = "1.0.0"
+colorpickerview = "2.3.0"
 
 [libraries]
 billing = { module = "com.android.billingclient:billing", version.ref = "billing" }
+colorpickerview = { module = "com.github.skydoves:colorpickerview", version.ref = "colorpickerview" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }

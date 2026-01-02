@@ -7,6 +7,7 @@ import com.olivadevelop.kore.db.factory.KoreDataBaseFactory;
 
 import java.util.Collections;
 import java.util.List;
+
 @Deprecated
 public abstract class KoreServiceImpl<D extends KoreDTO<V>, V extends KoreEntity, K> implements IKoreService<D, V, K> {
     protected abstract <F extends KoreDataBaseFactory<? extends KoreDataBase>> F getFactory();

@@ -23,9 +23,9 @@ import android.widget.ImageView;
 import androidx.core.content.FileProvider;
 
 import com.olivadevelop.kore.Constants;
+import com.olivadevelop.kore.R;
 import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.ui.SnackbarBuilder;
-import com.olivadevelop.kore.R;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 

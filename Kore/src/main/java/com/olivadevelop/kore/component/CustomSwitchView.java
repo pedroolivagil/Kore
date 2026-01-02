@@ -6,9 +6,8 @@ import android.util.AttributeSet;
 import androidx.annotation.Dimension;
 import androidx.annotation.Nullable;
 
-import com.olivadevelop.kore.preferences.PreferencesHelper;
 import com.olivadevelop.kore.databinding.CompCustomSwitchBinding;
-import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
+import com.olivadevelop.kore.preferences.PreferencesHelper;
 
 public class CustomSwitchView extends KoreComponentView<CompCustomSwitchBinding> {
 
@@ -20,22 +19,16 @@ public class CustomSwitchView extends KoreComponentView<CompCustomSwitchBinding>
             if (getOnValueChange() != null) { getOnValueChange().run(this); }
         });
     }
-
-    @Override
-    protected void init(Context context, @Nullable AttributeSet attrs) { }
     @Override
     public void setHint(String hint) { getBinding().toggleButton.setText(hint); }
     @Override
     public String getHint() { return String.valueOf(getBinding().toggleButton.getHint()); }
     @Override
-    protected DisabledOverlayBinding getDisabledOverlay() { return null; }
-    @Override
     public void setValue(Object s) { if (s instanceof Boolean) { getBinding().toggleButton.setChecked((boolean) s); } }
     public final boolean isActive() { return getBinding().toggleButton.isChecked(); }
     @Override
     protected void previewEditMode(ComponentAttributes c) {
-        if (c.getTitle() != null) { getBinding().txtTitle.setText(c.getTitle()); }
-        if (c.getSubtitle() != null) { getBinding().txtSubtitle.setText(c.getSubtitle()); }
+        super.previewEditMode(c);
         getBinding().toggleButton.setChecked(c.isChecked());
     }
     @Override

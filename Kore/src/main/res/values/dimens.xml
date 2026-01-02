@@ -1,3 +1,18 @@
 <resources>
+    <dimen name="custom_btn_corner_radius">8dp</dimen>
+    <dimen name="generic_panel_corners">8dp</dimen>
     <dimen name="generic_panel_padding">16dp</dimen>
+    <dimen name="generic_panel_elevation">4dp</dimen>
+    <dimen name="generic_panel_margin_full">16dp</dimen>
+    <dimen name="generic_panel_margin_half">8dp</dimen>
+    <dimen name="generic_background_corners">8dp</dimen>
+    <dimen name="generic_btn_padding_full">8dp</dimen>
+    <dimen name="field_required_text_margin_top">2dp</dimen>
+    <dimen name="field_required_text_size">10sp</dimen>
+    <dimen name="margin_between_components_form_min">16dp</dimen>
+    <dimen name="size_image_btn_preview_color">50dp</dimen>
+    <dimen name="margin_image_btn_preview_color">6dp</dimen>
+    <dimen name="padding_image_btn_preview_color">5dp</dimen>
+    <dimen name="padding_image_selector_component">5dp</dimen>
+    <dimen name="btn_icon_size">20dp</dimen>
 </resources>

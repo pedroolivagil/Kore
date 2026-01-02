@@ -15,8 +15,18 @@
     <color name="divider_dark">#22000000</color>
     <color name="light_gray">#BBBBBB</color>
     <color name="black">#FF000000</color>
+    <color name="gray">#EEEEEE</color>
     <color name="white">#FFFFFFFF</color>
     <color name="error">#FF990000</color>
     <color name="success">#FF20A90C</color>
     <color name="info">#FF0080FF</color>
+    <color name="pink_200">#FFFADCE2</color>
+    <color name="pink_500">#FFFFA5AC</color>
+    <color name="pink_700">#FFEB7896</color>
+    <color name="pink_900">#B36378</color>
+    <color name="pink_gray_light">#FFF6ECEC</color>
+    <color name="custom_btn_color">#FFF</color>
+    <color name="pastel_blue_purple">#AFA6FF</color>
+    <color name="pastel_pink_peach_text">#64473E</color>
+    <color name="text_hint_color_default">#DDDDDD</color>
 </resources>
