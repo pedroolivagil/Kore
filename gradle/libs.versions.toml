@@ -62,3 +62,4 @@ legacy-support-v4 = { group = "androidx.legacy", name = "legacy-support-v4", ver
 
 [plugins]
 android-application = { id = "com.android.library", version.ref = "agp" }
+com-android-application = { id = "com.android.application", version.ref = "agp" }

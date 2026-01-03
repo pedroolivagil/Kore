@@ -22,3 +22,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Kore"
 include(":Kore", ":kore-annotations", ":kore-processor")
+include(":kore-android-tester")

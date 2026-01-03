@@ -56,13 +56,15 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
         addOnClickListenerToView(getBinding().colorPreviewMinimized);
         addOnTouchListenerToView(getBinding().colorPickerPreview);
         addOnTouchListenerToView(getBinding().brightnessSlide);
-        getBinding().colorPickerPreview.post(() -> getActivity().setListener((requestCode, resultCode, data) -> {
-            if (CameraGalleryImageManager.REQUEST_CODE_GALLERY == requestCode) {
-                processIntentMediaGallery(context, data);
-            } else if (CameraGalleryImageManager.REQUEST_IMAGE_CAPTURE == requestCode && RESULT_OK == resultCode) {
-                processIntentMediaCamera(context);
-            }
-        }));
+        if (getKoreActivity() != null) {
+            getBinding().colorPickerPreview.post(() -> getKoreActivity().setListener((requestCode, resultCode, data) -> {
+                if (CameraGalleryImageManager.REQUEST_CODE_GALLERY == requestCode) {
+                    processIntentMediaGallery(context, data);
+                } else if (CameraGalleryImageManager.REQUEST_IMAGE_CAPTURE == requestCode && RESULT_OK == resultCode) {
+                    processIntentMediaCamera(context);
+                }
+            }));
+        }
         getBinding().colorPickerPreview.setPaletteDrawable(getColorHsvPalette());
         BrightnessSlideBar brightnessSlideBar = getBinding().brightnessSlide;
         getBinding().colorPickerPreview.attachBrightnessSlider(brightnessSlideBar);
@@ -120,9 +122,9 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
     @Override
     public void onClick(View v) {
         if (v == getBinding().btnPreviewGallery) {
-            CameraGalleryImageManager.openGallery(getActivity());
+            CameraGalleryImageManager.openGallery(getKoreActivity());
         } else if (v == getBinding().btnPreviewCamera) {
-            this.photoUri = CameraGalleryImageManager.openCamera(getActivity(), v, Constants.Files.DIR_TMP_PREVIEW);
+            this.photoUri = CameraGalleryImageManager.openCamera(getKoreActivity(), v, Constants.Files.DIR_TMP_PREVIEW);
         } else if (v == getBinding().btnClearImage) {
             resetImage();
         } else if (v == getBinding().btnResetColor) {

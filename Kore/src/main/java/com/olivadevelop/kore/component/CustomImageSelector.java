@@ -31,7 +31,7 @@ public class CustomImageSelector extends KoreComponentView<CompCustomImageSelect
     protected void init(Context context, @Nullable AttributeSet attrs) {
         addOnClickListenerToView(getBinding().btnPreviewGallery);
         addOnClickListenerToView(getBinding().btnPreviewCamera);
-        getBinding().getRoot().post(() -> getActivity().setListener((requestCode, resultCode, data) -> {
+        getBinding().getRoot().post(() -> getKoreActivity().setListener((requestCode, resultCode, data) -> {
             if (CameraGalleryImageManager.REQUEST_CODE_GALLERY == requestCode) {
                 processIntentMediaGallery(data);
             } else if (CameraGalleryImageManager.REQUEST_IMAGE_CAPTURE == requestCode && RESULT_OK == resultCode) {
@@ -56,9 +56,9 @@ public class CustomImageSelector extends KoreComponentView<CompCustomImageSelect
     @Override
     public void onClick(View v) {
         if (v == getBinding().btnPreviewCamera) {
-            this.photoUri = CameraGalleryImageManager.openCamera(getActivity(), v, Constants.Files.DIR_TMP_PREVIEW);
+            this.photoUri = CameraGalleryImageManager.openCamera(getKoreActivity(), v, Constants.Files.DIR_TMP_PREVIEW);
         } else if (v == getBinding().btnPreviewGallery) {
-            CameraGalleryImageManager.openGallery(getActivity());
+            CameraGalleryImageManager.openGallery(getKoreActivity());
         }
     }
     private void processIntentMediaGallery(Intent data) {

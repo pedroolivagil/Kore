@@ -1,6 +1,7 @@
 package com.olivadevelop.kore.component;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.util.AttributeSet;
@@ -21,11 +22,16 @@ public class CustomEditNumberView extends KoreComponentView<CompCustomEditTextBi
     public CustomEditNumberView(Context context, @Nullable AttributeSet attrs) { super(context, attrs); }
     @Override
     protected void configureFromLayout(ComponentAttributes c) {
-        if (StringUtils.isNotBlank(c.getTitle())) { getBinding().editText.setHint(c.getTitle()); }
-        getBinding().editText.setTextColor(c.getTextColor());
-        getBinding().editText.setTypeface(getBinding().editText.getTypeface(), c.getTextStyle());
-        getBinding().editText.setTextSize(Dimension.SP, c.getTextSize());
-        addOnFocusEditText(getBinding().editText, getBinding().borderView, R.color.gray, c.getBorderColor());
+        setMandatory(c.isMandatory());
+        getRequiredViewWarning().setVisibility(c.isMandatory() ? View.VISIBLE : View.GONE);
+        getBinding().textInputLayout.setErrorEnabled(c.isMandatory());
+        if (StringUtils.isNotBlank(c.getHintText())) { setHint(c.getHintText()); }
+        if (c.getHintTextColor() != -1) { getBinding().textInputLayout.setHintTextColor(ColorStateList.valueOf(c.getHintTextColor())); }
+        if (c.getBoxStrokeColor() != -1) { getBinding().textInputLayout.setBoxStrokeColor(c.getBoxStrokeColor()); }
+        if (c.getStartIconDrawable() != -1) {
+            getBinding().textInputLayout.setStartIconDrawable(c.getStartIconDrawable());
+            if (c.getStartIconTint() != -1) { getBinding().textInputLayout.setStartIconTintList(ColorStateList.valueOf(c.getStartIconTint())); }
+        }
     }
     @Override
     public Object getValue() { return getText(); }

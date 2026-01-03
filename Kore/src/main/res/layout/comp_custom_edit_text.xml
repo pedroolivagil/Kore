@@ -11,33 +11,24 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/required_warning_label"
+                style="@style/Theme.Kore.FieldRequiredText"
+                android:text="@string/field_required" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_input_layout"
+                style="@style/Theme.Kore.TextField"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/default_edit_text_hint">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/edit_text"
-                    style="@style/Theme.Kore.EditText"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/rounded_background_8"
-                    android:maxLines="2"
-                    android:paddingBottom="5dp" />
+                    android:layout_height="wrap_content" />
 
-                <View
-                    android:id="@+id/border_view"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginHorizontal="@dimen/generic_panel_margin_full"
-                    android:background="@color/gray" />
             </com.google.android.material.textfield.TextInputLayout>
-
-            <TextView
-                android:id="@+id/required_warning_label"
-                style="@style/Theme.Kore.FieldRequiredText"
-                android:text="@string/field_required" />
 
             <View
                 android:layout_width="match_parent"
