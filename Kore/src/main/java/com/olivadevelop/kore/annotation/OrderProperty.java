@@ -10,4 +10,5 @@ import java.lang.annotation.Target;
 public @interface OrderProperty {
     String value();
     int position();
+    int group() default 0;
 }
