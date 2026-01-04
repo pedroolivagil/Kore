@@ -16,25 +16,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-<!--        <com.olivadevelop.kore.component.CustomEditTextView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:boxStrokeColor="@color/error"-->
-<!--            app:hintText="@string/app_name"-->
-<!--            app:hintTextColor="@color/error"-->
-<!--            app:mandatory="true"-->
-<!--            app:startIconDrawable="@android:drawable/ic_menu_search"-->
-<!--            app:startIconTint="@color/error" />-->
+        <com.olivadevelop.kore.component.CustomEditTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxStrokeColor="@color/error"
+            app:hintText="@string/app_name"
+            app:hintTextColor="@color/error"
+            app:mandatory="true"
+            app:startIconDrawable="@android:drawable/ic_menu_search"
+            app:startIconTint="@color/error" />
 
-<!--        <com.olivadevelop.kore.component.CustomEditNumberView-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            app:boxStrokeColor="@color/error"-->
-<!--            app:hintText="@string/app_name"-->
-<!--            app:hintTextColor="@color/error"-->
-<!--            app:mandatory="true"-->
-<!--            app:startIconDrawable="@android:drawable/ic_menu_search"-->
-<!--            app:startIconTint="@color/error" />-->
+        <com.olivadevelop.kore.component.CustomEditNumberView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:boxStrokeColor="@color/error"
+            app:hintText="@string/app_name"
+            app:hintTextColor="@color/error"
+            app:mandatory="true"
+            app:startIconDrawable="@android:drawable/ic_menu_search"
+            app:startIconTint="@color/error" />
 
         <com.olivadevelop.kore.component.CustomColorPickerView
             android:id="@+id/color_picker_preview"
