@@ -37,7 +37,10 @@ import com.google.android.material.imageview.ShapeableImageView;
 import com.olivadevelop.kore.Constants;
 import com.olivadevelop.kore.R;
 import com.olivadevelop.kore.activity.KoreActivity;
+import com.olivadevelop.kore.annotation.CustomViewRender;
 import com.olivadevelop.kore.annotation.RegularExpressionField;
+import com.olivadevelop.kore.component.CustomEditNumberView;
+import com.olivadevelop.kore.component.CustomSwitchView;
 
 import org.apache.commons.lang3.time.DateUtils;
 
@@ -69,7 +72,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
@@ -376,6 +381,43 @@ public abstract class Utils {
     public static class Reflex {
         private static final Map<String, Class<?>> classCache = new HashMap<>();
         private static final Map<String, Method> methodCache = new HashMap<>();
+        private static final HashMap<Class<?>, Class<? extends View>> mapClassView;
+        private static final Map<Class<?>, Function<String, ?>> componentConverters = new HashMap<>();
+
+        static {
+            mapClassView = new HashMap<>();
+            mapClassView.put(byte.class, CustomEditNumberView.class);
+            mapClassView.put(Byte.class, CustomEditNumberView.class);
+            mapClassView.put(short.class, CustomEditNumberView.class);
+            mapClassView.put(Short.class, CustomEditNumberView.class);
+            mapClassView.put(int.class, CustomEditNumberView.class);
+            mapClassView.put(Integer.class, CustomEditNumberView.class);
+            mapClassView.put(long.class, CustomEditNumberView.class);
+            mapClassView.put(Long.class, CustomEditNumberView.class);
+            mapClassView.put(float.class, CustomEditNumberView.class);
+            mapClassView.put(Float.class, CustomEditNumberView.class);
+            mapClassView.put(double.class, CustomEditNumberView.class);
+            mapClassView.put(Double.class, CustomEditNumberView.class);
+            mapClassView.put(boolean.class, CustomSwitchView.class);
+            mapClassView.put(Boolean.class, CustomSwitchView.class);
+            // Definir converters
+            componentConverters.put(Byte.class, Byte::parseByte);
+            componentConverters.put(byte.class, Byte::parseByte);
+            componentConverters.put(Short.class, Short::parseShort);
+            componentConverters.put(short.class, Short::parseShort);
+            componentConverters.put(Integer.class, Integer::parseInt);
+            componentConverters.put(int.class, Integer::parseInt);
+            componentConverters.put(Long.class, Long::parseLong);
+            componentConverters.put(long.class, Long::parseLong);
+            componentConverters.put(Double.class, Double::parseDouble);
+            componentConverters.put(double.class, Double::parseDouble);
+            componentConverters.put(Float.class, Float::parseFloat);
+            componentConverters.put(float.class, Float::parseFloat);
+            componentConverters.put(Boolean.class, Boolean::parseBoolean);
+            componentConverters.put(boolean.class, Boolean::parseBoolean);
+            componentConverters.put(String.class, s -> s);
+        }
+
         public static <T> Class<T> getClassTypeArgument(Object obj) { return getClassTypeArgument(obj, 0); }
         public static <T> Class<T> getClassTypeArgument(Object obj, int indexParam) {
             Type type = obj.getClass().getGenericSuperclass();
@@ -435,6 +477,33 @@ public abstract class Utils {
                 throw new InstantiationException(e.getMessage());
             }
             return dto;
+        }
+        public static Class<? extends View> getViewFromTypeClass(Class<?> property, List<? extends Annotation> annotations) {
+            Optional<? extends CustomViewRender> opCvr = annotations.stream()
+                    .filter(a -> a instanceof CustomViewRender)
+                    .map(a -> (CustomViewRender) a)
+                    .findFirst();
+            if (opCvr.isPresent()) { return opCvr.get().value(); }
+            return mapClassView.getOrDefault(property, null);
+        }
+        public static <V> Optional<V> castToType(Map<Class<?>, List<? extends Annotation>> mapTargetType, String value) {
+            Optional<V> result = Optional.empty();
+            if (value == null || value.trim().isEmpty() || mapTargetType == null || mapTargetType.size() != 1) { return result; }
+            try {
+                for (Map.Entry<Class<?>, List<? extends Annotation>> entry : mapTargetType.entrySet()) {
+                    Class<?> targetType = entry.getKey();
+                    Optional<? extends CustomViewRender> optCvr = entry.getValue().stream()
+                            .filter(a -> a instanceof CustomViewRender)
+                            .map(a -> (CustomViewRender) a)
+                            .findFirst();
+                    if (optCvr.isPresent()) { targetType = optCvr.get().converTo(); }
+                    Function<String, ?> converter = componentConverters.get(targetType);
+                    return Optional.ofNullable((V) (converter != null ? converter.apply(value.trim()) : null));
+                }
+                return result;
+            } catch (Exception e) {
+                return result;
+            }
         }
         public static String processAllValueProperties(Activity a, String[] rawProperties) {
             List<String> results = new ArrayList<>();

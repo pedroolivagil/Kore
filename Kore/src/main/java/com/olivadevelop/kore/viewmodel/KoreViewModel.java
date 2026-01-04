@@ -1,58 +1,65 @@
 package com.olivadevelop.kore.viewmodel;
 
 import android.content.Context;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.olivadevelop.kore.Constants;
+import com.olivadevelop.kore.activity.KoreActivity;
+import com.olivadevelop.kore.annotation.OrderProperty;
+import com.olivadevelop.kore.annotation.OrderPropertyOnView;
+import com.olivadevelop.kore.annotation.RegularExpressionField;
+import com.olivadevelop.kore.annotation.RenderIgnoreView;
+import com.olivadevelop.kore.component.ComponentProperty;
 import com.olivadevelop.kore.component.KoreComponentView;
+import com.olivadevelop.kore.db.dto.KoreDTO;
 import com.olivadevelop.kore.db.entity.KoreEntity;
 import com.olivadevelop.kore.error.InvalidPropertyErrorVM;
 import com.olivadevelop.kore.nav.Navigation;
 import com.olivadevelop.kore.util.Utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.Setter;
 
 @Setter
 @Getter
-public abstract class KoreViewModel<T extends KoreEntity> extends ViewModel implements Cloneable {
+@SuppressWarnings("unchecked")
+public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> extends ViewModel implements Cloneable {
     private final MutableLiveData<Navigation.NavigationScreen> screenBack = new MutableLiveData<>(null);
 
-    private Context ctx;
+    private KoreActivity<?, ?> ctx;
     private T data;
     private boolean hasValidation = true;
     private Map<String, KoreComponentView<?>> componentViewMap = new HashMap<>();
     private Set<InvalidPropertyErrorVM> errors = new HashSet<>();
-    public abstract boolean isValid();
-    public abstract KoreViewModel<T> buildEntityData();
-
-    @NonNull
-    @Override
-    public KoreViewModel<T> clone() {
-        try {
-            return (KoreViewModel<T>) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new AssertionError();
-        }
-    }
-    public void reload() {
-        buildNewData();
-    }
     public KoreViewModel() { buildNewData(); }
+    public boolean isValid() { return false; }
+    public KoreViewModel<T> buildEntityData() { return null; }
+    public void reload() { buildNewData(); }
     public void clearData() { buildNewData(); }
     protected final void buildNewData() {
         try {
@@ -64,7 +71,7 @@ public abstract class KoreViewModel<T extends KoreEntity> extends ViewModel impl
     public final void copyDataViewModel(KoreViewModel<?> viewModel) {
         Predicate<? super Field> filter = f -> {
             String name = f.getName();
-            return !name.equals("componentViewMap") && !name.equals("errors") && !name.equals("hasValidation") && !name.equals("step") && !name.equals("impl");
+            return !name.equals("componentViewMap") && !name.equals("errors") && !name.equals("hasValidation") && !name.equals("impl");
         };
         Set<Field> fields = new HashSet<>(FieldUtils.getAllFieldsList(viewModel.getClass()));
         fields.stream().filter(filter).forEach(f -> {
@@ -73,6 +80,16 @@ public abstract class KoreViewModel<T extends KoreEntity> extends ViewModel impl
                 f.set(this, f.get(viewModel));
             } catch (IllegalAccessException e) { Log.e(Constants.Log.TAG, "Error al recuperar el estado anterior del viewmodel. " + e.getMessage()); }
         });
+    }
+
+    @NonNull
+    @Override
+    public KoreViewModel<T> clone() {
+        try {
+            return (KoreViewModel<T>) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
     @Override
     public boolean equals(Object o) {
@@ -84,5 +101,64 @@ public abstract class KoreViewModel<T extends KoreEntity> extends ViewModel impl
     @Override
     public int hashCode() {
         return Objects.hash(componentViewMap, errors, hasValidation, data);
+    }
+    public final void buildComponentsFromProperties() {
+        List<ComponentProperty> properties = getComponentPropertyList();
+        properties.forEach(this::toComponentMap);
+    }
+    @NonNull
+    private List<ComponentProperty> getComponentPropertyList() {
+        List<ComponentProperty> properties = new ArrayList<>();
+        Class<? extends KoreViewModel<T>> aClass = (Class<? extends KoreViewModel<T>>) this.getClass();
+        Predicate<Field> fieldPredicate = f -> !f.isAnnotationPresent(RenderIgnoreView.class);
+        BiConsumer<OrderPropertyOnView, Field> fieldConsumer = (opov, f) -> {
+            int order = 0;
+            if (opov != null) {
+                Optional<OrderProperty> optOrder = Arrays.stream(opov.value()).filter(op -> op.value().equals(f.getName())).findFirst();
+                if (optOrder.isPresent()) { order = optOrder.get().position(); }
+            }
+            properties.add(ComponentProperty.builder()
+                    .componentClass(f.getType())
+                    .property(f.getName())
+                    .annotations(Arrays.stream(f.getDeclaredAnnotations()).collect(Collectors.toList()))
+                    .order(order)
+                    .build());
+        };
+        OrderPropertyOnView opov = aClass.getDeclaredAnnotation(OrderPropertyOnView.class);
+        FieldUtils.getAllFieldsList(aClass).stream().filter(fieldPredicate).forEach(f -> fieldConsumer.accept(opov, f));
+        properties.sort(Comparator.comparingInt(ComponentProperty::getOrder));
+        return properties;
+    }
+    private void toComponentMap(ComponentProperty cp) {
+        Class<? extends View> classComponent = Utils.Reflex.getViewFromTypeClass(cp.getComponentClass(), cp.getAnnotations());
+        try {
+            View view = classComponent.getDeclaredConstructor(Context.class, AttributeSet.class).newInstance(getCtx(), null);
+            if (view instanceof KoreComponentView) {
+                KoreComponentView<?> component = (KoreComponentView<?>) view;
+                String id = cp.getProperty();
+                component.setProperty(Map.of(cp.getComponentClass(), cp.getAnnotations())).setTag(id);
+                component.setHint(buildHint(id));
+                component.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                component.setVisibility(View.VISIBLE);
+                component.setActivity(getCtx());
+                component.setMandatory(true);
+                cp.getAnnotations().stream().filter(a -> a instanceof RegularExpressionField).map(a -> (RegularExpressionField) a).findFirst().ifPresent(a -> {
+                    component.setMandatory(a.mandatory());
+                    component.setMaxLines(a.maxLines());
+                    component.setMaxLength(a.maxLength());
+                    component.setMinLength(a.minLength());
+                    component.setImmediateValidation(a.inmediateValidation());
+                    component.setRegexPattern(a.value());
+                });
+                Object value = FieldUtils.readField(getData(), id, true);
+                if (value != null) { component.setValue(value); }
+                getComponentViewMap().put(id, component);
+            }
+        } catch (ReflectiveOperationException e) {
+            Log.e(Constants.Log.TAG, "Error al crear los componentes del viewmodel. " + e.getMessage());
+        }
+    }
+    private String buildHint(String id) {
+        return Utils.translateStringIdFromResourceStrings(getCtx(), Constants.UI.LABEL_FORM + id, StringUtils.capitalize(id));
     }
 }

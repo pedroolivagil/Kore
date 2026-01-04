@@ -6,7 +6,6 @@ import android.content.res.TypedArray;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -17,7 +16,6 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
 
-import com.olivadevelop.kore.Constants;
 import com.olivadevelop.kore.R;
 import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.annotation.RegularExpressionField;
@@ -104,8 +102,8 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         if (e == null) { return; }
         e.setInputType(Utils.getInputTypeFromClass(this.property));
         getProperty().forEach((property, annotations) -> {
-            RegularExpressionField regex =
-                    annotations.stream().filter(p -> p instanceof RegularExpressionField).map(a -> (RegularExpressionField) a).findFirst().orElse(null);
+            RegularExpressionField regex = annotations.stream()
+                    .filter(p -> p instanceof RegularExpressionField).map(a -> (RegularExpressionField) a).findFirst().orElse(null);
             post(() -> this.errorMessageFieldType = Utils.intStringFromInputType(getKoreActivity(), property, regex));
         });
     }

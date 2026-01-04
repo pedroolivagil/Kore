@@ -68,6 +68,8 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         Set<String> imports = new HashSet<>();
         Set<Property> properties = new HashSet<>();
         calculateClass(entity, config, imports, properties);
+        imports.add(entity.getQualifiedName().toString());
+        if (properties.isEmpty()) { imports.remove(lombok.AllArgsConstructor.class.getCanonicalName()); }
         final StringBuilder sb = new StringBuilder();
         sb.append("package ").append(pkg).append(Params.SEMICOLON).append(Params.LINE_BREAK_DOUBLE);
         imports.stream().sorted().forEach(i -> sb.append("import ").append(i).append(Params.SEMICOLON).append(Params.LINE_BREAK));
@@ -75,11 +77,21 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         sb.append("@Builder").append(Params.LINE_BREAK);
         sb.append("@Data").append(Params.LINE_BREAK);
         sb.append("@NoArgsConstructor").append(Params.LINE_BREAK);
-        sb.append("@AllArgsConstructor").append(Params.LINE_BREAK);
+        if (!properties.isEmpty()) { sb.append("@AllArgsConstructor").append(Params.LINE_BREAK); }
         sb.append("@EqualsAndHashCode(callSuper = true)").append(Params.LINE_BREAK);
-        sb.append("@Generated(value = \"").append(entity.getSimpleName()).append(".class\", date = \"").append(getCurrentDate()).append("\", comments = \"").append(getComment()).append("\")").append(Params.LINE_BREAK);
-        sb.append("public class ").append(dtoName).append(" extends KoreDTO {").append(Params.LINE_BREAK);
-        properties.stream().sorted(Comparator.comparing(p -> p.order)).forEach(p -> sb.append("    private ").append(p.type).append(" ").append(p.property).append(Params.SEMICOLON).append(Params.LINE_BREAK));
+        sb.append("@Generated(value = \"")
+                .append(entity.getSimpleName())
+                .append(".class\", date = \"")
+                .append(getCurrentDate())
+                .append("\", comments = \"")
+                .append(getComment()).append("\")").append(Params.LINE_BREAK);
+        sb.append("public class ").append(dtoName).append(" extends KoreDTO<")
+                .append(entity.getSimpleName().toString())
+                .append("> {")
+                .append(Params.LINE_BREAK);
+        properties.stream()
+                .sorted(Comparator.comparing(p -> p.order))
+                .forEach(p -> sb.append("    private ").append(p.type).append(" ").append(p.property).append(Params.SEMICOLON).append(Params.LINE_BREAK));
         sb.append("}").append(Params.LINE_BREAK);
         try {
             JavaFileObject file = filer.createSourceFile(pkg + "." + dtoName);

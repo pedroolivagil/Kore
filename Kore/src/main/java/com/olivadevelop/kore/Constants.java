@@ -20,6 +20,7 @@ public abstract class Constants {
 
     public static class Defaults {
         public static final int DATABASE_VERSION = 1;
+        public static final String PACKAGE_DTO = "com.olivadevelop.kore.db.dto";
     }
 
     public static class Regex {
