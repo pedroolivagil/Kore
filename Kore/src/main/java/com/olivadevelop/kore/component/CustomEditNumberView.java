@@ -8,7 +8,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
 
-import androidx.annotation.Dimension;
 import androidx.annotation.Nullable;
 
 import com.olivadevelop.kore.R;

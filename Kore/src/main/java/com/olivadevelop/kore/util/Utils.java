@@ -152,10 +152,7 @@ public abstract class Utils {
             return fromTimestamp(timestamp).toLocalDate();
         }
         public static LocalDateTime fromTimestamp(long timestamp) {
-            return LocalDateTime.ofInstant(
-                    Instant.ofEpochMilli(timestamp),
-                    ZoneId.systemDefault()
-            );
+            return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
         }
         public static long fromLocalDateTime(LocalDateTime dateTime) { return dateTime.toInstant(ZoneOffset.UTC).toEpochMilli(); }
         public static long fromLocalDate(LocalDate dateTime) { return Date.from(dateTime.atStartOfDay(ZoneId.systemDefault()).toInstant()).getTime(); }
@@ -350,29 +347,15 @@ public abstract class Utils {
         }
         public static void animateHorizontalSlide(TextView view, boolean toRight, String newText) {
             float direction = toRight ? 1f : -1f;
-            view.animate()
-                    .translationX(view.getWidth() * direction)
-                    .alpha(0f)
-                    .setDuration(250)
-                    .withEndAction(() -> {
-                        view.setText(newText);
-                        view.setTranslationX(view.getWidth() * -direction);
-                        view.animate()
-                                .translationX(0)
-                                .alpha(1f)
-                                .setDuration(250)
-                                .start();
-                    })
-                    .start();
+            view.animate().translationX(view.getWidth() * direction).alpha(0f).setDuration(250).withEndAction(() -> {
+                view.setText(newText);
+                view.setTranslationX(view.getWidth() * -direction);
+                view.animate().translationX(0).alpha(1f).setDuration(250).start();
+            }).start();
         }
         public static void bounceAnimation(View view, boolean toRight) {
-            view.animate()
-                    .translationX(toRight ? 50 : -50)   // desplazamiento pequeño
-                    .setDuration(60)
-                    .withEndAction(() ->
-                            view.animate().translationX(0).setDuration(60)
-                    )
-                    .start();
+            view.animate().translationX(toRight ? 50 : -50)   // desplazamiento pequeño
+                    .setDuration(60).withEndAction(() -> view.animate().translationX(0).setDuration(60)).start();
         }
 
     }
@@ -430,6 +413,40 @@ public abstract class Utils {
             }
             return objClass;
         }
+        public static Class<?> getClassTypeFromClassType(Type type) {
+            // Caso: Something<T>
+            if (type instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType) type;
+                Type inner = pt.getActualTypeArguments()[0];
+                if (inner instanceof Class<?>) { return (Class<?>) inner; }
+                // Para casos anidados tipo LiveData<List<X>>
+                if (inner instanceof ParameterizedType) { return getClassTypeFromClassType(inner); }
+            }
+            // Caso: tipo simple
+            if (type instanceof Class<?>) { return (Class<?>) type; }
+            return null;
+        }
+        public static TypeDescriptor getClassTypeFromType(Type type) {
+            // Caso parametrizado: Something<T> o Pair<K,V>
+            if (type instanceof ParameterizedType) {
+                ParameterizedType pt = (ParameterizedType) type;
+                Class<?> raw = (Class<?>) pt.getRawType();
+                List<Class<?>> args = new ArrayList<>();
+                for (Type arg : pt.getActualTypeArguments()) {
+                    if (arg instanceof Class<?>) {
+                        args.add((Class<?>) arg);
+                    } else if (arg instanceof ParameterizedType) {
+                        // Extraemos el tipo base del anidado
+                        args.add((Class<?>) ((ParameterizedType) arg).getRawType());
+                    }
+                }
+                return new TypeDescriptor(raw, args);
+            }
+            // Caso simple
+            if (type instanceof Class<?>) { return new TypeDescriptor(null, List.of((Class<?>) type)); }
+            return null;
+        }
+        public Class<?> getInnermostType(TypeDescriptor td) { return td.getArguments().isEmpty() ? null : td.getArguments().get(td.getArguments().size() - 1); }
         public static <T extends ViewBinding> T initBinding(Activity ctx) { return initBinding(ctx, 0); }
         public static <T extends ViewBinding> T initBinding(Activity ctx, int indexParam) {
             try {
@@ -479,10 +496,8 @@ public abstract class Utils {
             return dto;
         }
         public static Class<? extends View> getViewFromTypeClass(Class<?> property, List<? extends Annotation> annotations) {
-            Optional<? extends CustomViewRender> opCvr = annotations.stream()
-                    .filter(a -> a instanceof CustomViewRender)
-                    .map(a -> (CustomViewRender) a)
-                    .findFirst();
+            Optional<? extends CustomViewRender> opCvr =
+                    annotations.stream().filter(a -> a instanceof CustomViewRender).map(a -> (CustomViewRender) a).findFirst();
             if (opCvr.isPresent()) { return opCvr.get().value(); }
             return mapClassView.getOrDefault(property, null);
         }
@@ -492,10 +507,8 @@ public abstract class Utils {
             try {
                 for (Map.Entry<Class<?>, List<? extends Annotation>> entry : mapTargetType.entrySet()) {
                     Class<?> targetType = entry.getKey();
-                    Optional<? extends CustomViewRender> optCvr = entry.getValue().stream()
-                            .filter(a -> a instanceof CustomViewRender)
-                            .map(a -> (CustomViewRender) a)
-                            .findFirst();
+                    Optional<? extends CustomViewRender> optCvr =
+                            entry.getValue().stream().filter(a -> a instanceof CustomViewRender).map(a -> (CustomViewRender) a).findFirst();
                     if (optCvr.isPresent()) { targetType = optCvr.get().converTo(); }
                     Function<String, ?> converter = componentConverters.get(targetType);
                     return Optional.ofNullable((V) (converter != null ? converter.apply(value.trim()) : null));
@@ -566,16 +579,11 @@ public abstract class Utils {
             return param;
         }
         private static Object invokePropertyCall(Activity a, PropertyCall call) throws Exception {
-            Class<?> clazz = classCache.computeIfAbsent(
-                    call.className,
-                    name -> { try { return Class.forName(name); } catch (Exception e) { throw new RuntimeException(e); } }
-            );
-            List<Object> params = call.rawParams.stream()
-                    .map(p -> resolveParam(a, p))
-                    .collect(Collectors.toList());
-            Class<?>[] paramTypes = params.stream()
-                    .map(Object::getClass)
-                    .toArray(Class[]::new);
+            Class<?> clazz = classCache.computeIfAbsent(call.className, name -> {
+                try { return Class.forName(name); } catch (Exception e) { throw new RuntimeException(e); }
+            });
+            List<Object> params = call.rawParams.stream().map(p -> resolveParam(a, p)).collect(Collectors.toList());
+            Class<?>[] paramTypes = params.stream().map(Object::getClass).toArray(Class[]::new);
             String methodKey = call.className + "#" + call.methodName + Arrays.toString(paramTypes);
             Method method = methodCache.get(methodKey);
             if (method == null) {
@@ -624,14 +632,7 @@ public abstract class Utils {
         }
         private static boolean isPrimitiveWrapperCompatible(Class<?> expected, Class<?> actual) {
             if (!expected.isPrimitive()) { return false; }
-            return (expected == int.class && actual == Integer.class) ||
-                    (expected == boolean.class && actual == Boolean.class) ||
-                    (expected == long.class && actual == Long.class) ||
-                    (expected == double.class && actual == Double.class) ||
-                    (expected == float.class && actual == Float.class) ||
-                    (expected == short.class && actual == Short.class) ||
-                    (expected == byte.class && actual == Byte.class) ||
-                    (expected == char.class && actual == Character.class);
+            return (expected == int.class && actual == Integer.class) || (expected == boolean.class && actual == Boolean.class) || (expected == long.class && actual == Long.class) || (expected == double.class && actual == Double.class) || (expected == float.class && actual == Float.class) || (expected == short.class && actual == Short.class) || (expected == byte.class && actual == Byte.class) || (expected == char.class && actual == Character.class);
         }
         private static class PropertyCall {
             String className;

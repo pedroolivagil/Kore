@@ -121,13 +121,20 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                 Optional<OrderProperty> optOrder = Arrays.stream(opov.value()).filter(op -> op.value().equals(f.getName())).findFirst();
                 if (optOrder.isPresent()) { order = optOrder.get().position(); }
             }
-            properties.add(ComponentProperty.builder().componentClass(f.getType()).property(f.getName()).annotations(Arrays.stream(f.getDeclaredAnnotations()).collect(Collectors.toList())).order(order).build());
+            properties.add(ComponentProperty.builder() //Builder
+                    .componentClass(extractFromParametrizedType(f))
+                    .property(f.getName())
+                    .annotations(Arrays.stream(f.getDeclaredAnnotations()).collect(Collectors.toList()))
+                    .order(order)
+                    .build());
         };
         OrderPropertyOnView opov = aClass.getDeclaredAnnotation(OrderPropertyOnView.class);
         FieldUtils.getAllFieldsList(aClass).stream().filter(fieldPredicate).forEach(f -> fieldConsumer.accept(opov, f));
         properties.sort(Comparator.comparingInt(ComponentProperty::getOrder));
         return properties;
     }
+    @NonNull
+    private static Class<?> extractFromParametrizedType(Field f) { return Utils.Reflex.getClassTypeFromClassType(f.getGenericType()); }
     private void toComponentMap(ComponentProperty cp) {
         Class<? extends View> classComponent = Utils.Reflex.getViewFromTypeClass(cp.getComponentClass(), cp.getAnnotations());
         String id = cp.getProperty();
