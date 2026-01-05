@@ -9,4 +9,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface StaticProperties {
     String[] ignore() default {};
+    boolean includeHierarchy() default false;
+    int hierarchyLevel() default 0;
 }
