@@ -50,11 +50,15 @@ import lombok.Setter;
 @SuppressWarnings("unchecked")
 public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> extends ViewModel implements Cloneable {
     private final MutableLiveData<Navigation.NavigationScreen> screenBack = new MutableLiveData<>(null);
-
+    @RenderIgnoreView
     private KoreActivity<?, ?> ctx;
+    @RenderIgnoreView
     private T data;
+    @RenderIgnoreView
     private boolean hasValidation = true;
+    @RenderIgnoreView
     private Map<String, KoreComponentView<?>> componentViewMap = new HashMap<>();
+    @RenderIgnoreView
     private Set<InvalidPropertyErrorVM> errors = new HashSet<>();
     public KoreViewModel() { buildNewData(); }
     public boolean isValid() { return false; }
@@ -117,12 +121,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                 Optional<OrderProperty> optOrder = Arrays.stream(opov.value()).filter(op -> op.value().equals(f.getName())).findFirst();
                 if (optOrder.isPresent()) { order = optOrder.get().position(); }
             }
-            properties.add(ComponentProperty.builder()
-                    .componentClass(f.getType())
-                    .property(f.getName())
-                    .annotations(Arrays.stream(f.getDeclaredAnnotations()).collect(Collectors.toList()))
-                    .order(order)
-                    .build());
+            properties.add(ComponentProperty.builder().componentClass(f.getType()).property(f.getName()).annotations(Arrays.stream(f.getDeclaredAnnotations()).collect(Collectors.toList())).order(order).build());
         };
         OrderPropertyOnView opov = aClass.getDeclaredAnnotation(OrderPropertyOnView.class);
         FieldUtils.getAllFieldsList(aClass).stream().filter(fieldPredicate).forEach(f -> fieldConsumer.accept(opov, f));
@@ -153,7 +152,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                 getComponentViewMap().put(id, component);
             }
         } catch (Throwable e) {
-            Log.e(Constants.Log.TAG, "Error al crear el componente '"+ id +"' del viewmodel. " + e.getMessage());
+            Log.e(Constants.Log.TAG, "Error al crear el componente '" + id + "' del viewmodel. " + e.getMessage(), e);
         }
     }
     private String buildHint(String id) {
