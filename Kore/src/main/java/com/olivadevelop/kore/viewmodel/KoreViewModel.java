@@ -50,15 +50,10 @@ import lombok.Setter;
 @SuppressWarnings("unchecked")
 public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> extends ViewModel implements Cloneable {
     private final MutableLiveData<Navigation.NavigationScreen> screenBack = new MutableLiveData<>(null);
-    @RenderIgnoreView
     private KoreActivity<?, ?> ctx;
-    @RenderIgnoreView
     private T data;
-    @RenderIgnoreView
     private boolean hasValidation = true;
-    @RenderIgnoreView
     private Map<String, KoreComponentView<?>> componentViewMap = new HashMap<>();
-    @RenderIgnoreView
     private Set<InvalidPropertyErrorVM> errors = new HashSet<>();
     public KoreViewModel() { buildNewData(); }
     public boolean isValid() { return false; }
@@ -114,7 +109,12 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
     private List<ComponentProperty> getComponentPropertyList() {
         List<ComponentProperty> properties = new ArrayList<>();
         Class<? extends KoreViewModel<T>> aClass = (Class<? extends KoreViewModel<T>>) this.getClass();
-        Predicate<Field> fieldPredicate = f -> !f.isAnnotationPresent(RenderIgnoreView.class);
+        Predicate<Field> filterIgnore = f -> {
+            String name = f.getName();
+            return !f.isAnnotationPresent(RenderIgnoreView.class) && !name.equals("componentViewMap")
+                    && !name.equals("errors") && !name.equals("hasValidation") && !name.equals("impl")
+                    && !name.equals("screenBack") && !name.equals("ctx") && !name.equals("data");
+        };
         BiConsumer<OrderPropertyOnView, Field> fieldConsumer = (opov, f) -> {
             int order = 0;
             if (opov != null) {
@@ -129,7 +129,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                     .build());
         };
         OrderPropertyOnView opov = aClass.getDeclaredAnnotation(OrderPropertyOnView.class);
-        FieldUtils.getAllFieldsList(aClass).stream().filter(fieldPredicate).forEach(f -> fieldConsumer.accept(opov, f));
+        FieldUtils.getAllFieldsList(aClass).stream().filter(filterIgnore).forEach(f -> fieldConsumer.accept(opov, f));
         properties.sort(Comparator.comparingInt(ComponentProperty::getOrder));
         return properties;
     }
