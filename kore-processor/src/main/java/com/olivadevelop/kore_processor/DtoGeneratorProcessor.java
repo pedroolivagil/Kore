@@ -9,7 +9,6 @@ import java.io.Writer;
 import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -90,8 +89,8 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
                 .append("> {")
                 .append(Params.LINE_BREAK);
         properties.stream()
-                .sorted(Comparator.comparing(p -> p.order))
-                .forEach(p -> sb.append("    private ").append(p.type).append(" ").append(p.property).append(Params.SEMICOLON).append(Params.LINE_BREAK));
+                .sorted(Comparator.comparing(Property::getOrder))
+                .forEach(p -> sb.append("    private ").append(p.getType()).append(" ").append(p.getProperty()).append(Params.SEMICOLON).append(Params.LINE_BREAK));
         sb.append("}").append(Params.LINE_BREAK);
         try {
             JavaFileObject file = filer.createSourceFile(pkg + "." + dtoName);
@@ -227,26 +226,5 @@ public class DtoGeneratorProcessor extends AbstractProcessor {
         String collectionSimple = collectionFqn.substring(collectionFqn.lastIndexOf('.') + 1);
         String genericSimple = genericFqn.substring(genericFqn.lastIndexOf('.') + 1);
         return collectionSimple + "<" + genericSimple + ">";
-    }
-    private static class Property {
-        private final Integer order;
-        private final String type;
-        private final String property;
-        public Property(Integer order, String type, String property) {
-            this.order = order;
-            this.type = type;
-            this.property = property;
-        }
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) { return true; }
-            if (o == null || getClass() != o.getClass()) { return false; }
-            Property property1 = (Property) o;
-            return Objects.equals(order, property1.order) && Objects.equals(type, property1.type) && Objects.equals(property, property1.property);
-        }
-        @Override
-        public int hashCode() {
-            return Objects.hash(order, type, property);
-        }
     }
 }

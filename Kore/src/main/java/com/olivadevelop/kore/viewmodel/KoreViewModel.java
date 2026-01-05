@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.olivadevelop.kore.Constants;
+import com.olivadevelop.kore.KoreViewModelStatic;
 import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.annotation.OrderProperty;
 import com.olivadevelop.kore.annotation.OrderPropertyOnView;
@@ -23,6 +24,7 @@ import com.olivadevelop.kore.db.entity.KoreEntity;
 import com.olivadevelop.kore.error.InvalidPropertyErrorVM;
 import com.olivadevelop.kore.nav.Navigation;
 import com.olivadevelop.kore.util.Utils;
+import com.olivadevelop.kore_annotations.StaticProperties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -48,6 +50,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @SuppressWarnings("unchecked")
+@StaticProperties
 public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> extends ViewModel implements Cloneable {
     private final MutableLiveData<Navigation.NavigationScreen> screenBack = new MutableLiveData<>(null);
     private KoreActivity<?, ?> ctx;
@@ -111,9 +114,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         Class<? extends KoreViewModel<T>> aClass = (Class<? extends KoreViewModel<T>>) this.getClass();
         Predicate<Field> filterIgnore = f -> {
             String name = f.getName();
-            return !f.isAnnotationPresent(RenderIgnoreView.class) && !name.equals("componentViewMap")
-                    && !name.equals("errors") && !name.equals("hasValidation") && !name.equals("impl")
-                    && !name.equals("screenBack") && !name.equals("ctx") && !name.equals("data");
+            return !f.isAnnotationPresent(RenderIgnoreView.class) && !KoreViewModelStatic.properties().contains(name);
         };
         BiConsumer<OrderPropertyOnView, Field> fieldConsumer = (opov, f) -> {
             int order = 0;

@@ -12,6 +12,7 @@ dependencies {
     implementation("com.google.auto.service:auto-service-annotations:1.1.1")
     implementation("com.google.auto.service:auto-service:1.1.1")
     annotationProcessor("com.google.auto.service:auto-service:1.1.1")
+    implementation(libs.commons.lang3)
     compileOnly(libs.lombok)
 }
 

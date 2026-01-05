@@ -270,6 +270,29 @@ public abstract class Utils {
         NumberFormat formatter = NumberFormat.getInstance(Locale.GERMANY);
         return formatter.format(number);
     }
+    public static String camelCaseToConstant(String name) {
+        if (name == null || name.isEmpty()) { return name; }
+        StringBuilder result = new StringBuilder();
+        char[] chars = name.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+            // Inserta _ si:
+            // - cambio de minúscula a mayúscula
+            // - cambio de letra a número
+            // - cambio de número a letra
+            if (i > 0) {
+                char prev = chars[i - 1];
+                boolean lowerToUpper = Character.isLowerCase(prev) && Character.isUpperCase(c);
+                boolean letterToDigit = Character.isLetter(prev) && Character.isDigit(c);
+                boolean digitToLetter = Character.isDigit(prev) && Character.isLetter(c);
+                boolean acronymBoundary =
+                        Character.isUpperCase(prev) && Character.isUpperCase(c) && i + 1 < chars.length && Character.isLowerCase(chars[i + 1]);
+                if (lowerToUpper || letterToDigit || digitToLetter || acronymBoundary) { result.append('_'); }
+            }
+            result.append(Character.toUpperCase(c));
+        }
+        return result.toString();
+    }
     public static int getInputTypeFromClass(Map<Class<?>, List<? extends Annotation>> mapProperty) {
         if (mapProperty == null || mapProperty.size() != 1) { return InputType.TYPE_CLASS_TEXT; }
         for (Map.Entry<Class<?>, List<? extends Annotation>> entry : mapProperty.entrySet()) {
