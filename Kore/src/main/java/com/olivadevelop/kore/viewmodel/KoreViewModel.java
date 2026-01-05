@@ -150,11 +150,9 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                     component.setImmediateValidation(a.inmediateValidation());
                     component.setRegexPattern(a.value());
                 });
-                Object value = FieldUtils.readField(getData(), id, true);
-                if (value != null) { component.setValue(value); }
                 getComponentViewMap().put(id, component);
             }
-        } catch (ReflectiveOperationException e) {
+        } catch (Throwable e) {
             Log.e(Constants.Log.TAG, "Error al crear los componentes del viewmodel. " + e.getMessage());
         }
     }
