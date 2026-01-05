@@ -131,11 +131,11 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
     }
     private void toComponentMap(ComponentProperty cp) {
         Class<? extends View> classComponent = Utils.Reflex.getViewFromTypeClass(cp.getComponentClass(), cp.getAnnotations());
+        String id = cp.getProperty();
         try {
             View view = classComponent.getDeclaredConstructor(Context.class, AttributeSet.class).newInstance(getCtx(), null);
             if (view instanceof KoreComponentView) {
                 KoreComponentView<?> component = (KoreComponentView<?>) view;
-                String id = cp.getProperty();
                 component.setProperty(Map.of(cp.getComponentClass(), cp.getAnnotations())).setTag(id);
                 component.setHint(buildHint(id));
                 component.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -153,7 +153,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                 getComponentViewMap().put(id, component);
             }
         } catch (Throwable e) {
-            Log.e(Constants.Log.TAG, "Error al crear los componentes del viewmodel. " + e.getMessage());
+            Log.e(Constants.Log.TAG, "Error al crear el componente '"+ id +"' del viewmodel. " + e.getMessage());
         }
     }
     private String buildHint(String id) {
