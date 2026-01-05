@@ -159,7 +159,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                 getComponentViewMap().put(id, component);
             }
         } catch (Throwable e) {
-            Log.e(Constants.Log.TAG, "Error al crear el componente '" + id + "' del viewmodel. " + e.getMessage(), e);
+            Log.e(Constants.Log.TAG, "Error al crear el componente '" + id + "' ('" + cp.getComponentClass() + "') del viewmodel. " + e.getMessage(), e);
         }
     }
     private String buildHint(String id) {
