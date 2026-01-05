@@ -50,7 +50,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @SuppressWarnings("unchecked")
-@StaticProperties
+@StaticProperties(includeHierarchy = true, hierarchyLevel = 1)
 public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> extends ViewModel implements Cloneable {
     private final MutableLiveData<Navigation.NavigationScreen> screenBack = new MutableLiveData<>(null);
     private KoreActivity<?, ?> ctx;
@@ -71,10 +71,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         }
     }
     public final void copyDataViewModel(KoreViewModel<?> viewModel) {
-        Predicate<? super Field> filter = f -> {
-            String name = f.getName();
-            return !name.equals("componentViewMap") && !name.equals("errors") && !name.equals("hasValidation") && !name.equals("impl");
-        };
+        Predicate<? super Field> filter = f -> !KoreViewModelStatic.properties().contains(f.getName());
         Set<Field> fields = new HashSet<>(FieldUtils.getAllFieldsList(viewModel.getClass()));
         fields.stream().filter(filter).forEach(f -> {
             try {
