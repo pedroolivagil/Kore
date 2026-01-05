@@ -40,6 +40,7 @@ import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.annotation.CustomViewRender;
 import com.olivadevelop.kore.annotation.RegularExpressionField;
 import com.olivadevelop.kore.component.CustomEditNumberView;
+import com.olivadevelop.kore.component.CustomEditTextView;
 import com.olivadevelop.kore.component.CustomSwitchView;
 
 import org.apache.commons.lang3.time.DateUtils;
@@ -52,6 +53,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -369,20 +372,24 @@ public abstract class Utils {
 
         static {
             mapClassView = new HashMap<>();
-            mapClassView.put(byte.class, CustomEditNumberView.class);
-            mapClassView.put(Byte.class, CustomEditNumberView.class);
-            mapClassView.put(short.class, CustomEditNumberView.class);
-            mapClassView.put(Short.class, CustomEditNumberView.class);
-            mapClassView.put(int.class, CustomEditNumberView.class);
-            mapClassView.put(Integer.class, CustomEditNumberView.class);
-            mapClassView.put(long.class, CustomEditNumberView.class);
-            mapClassView.put(Long.class, CustomEditNumberView.class);
-            mapClassView.put(float.class, CustomEditNumberView.class);
-            mapClassView.put(Float.class, CustomEditNumberView.class);
-            mapClassView.put(double.class, CustomEditNumberView.class);
-            mapClassView.put(Double.class, CustomEditNumberView.class);
             mapClassView.put(boolean.class, CustomSwitchView.class);
+            mapClassView.put(byte.class, CustomEditNumberView.class);
+            mapClassView.put(short.class, CustomEditNumberView.class);
+            mapClassView.put(int.class, CustomEditNumberView.class);
+            mapClassView.put(long.class, CustomEditNumberView.class);
+            mapClassView.put(float.class, CustomEditNumberView.class);
+            mapClassView.put(double.class, CustomEditNumberView.class);
             mapClassView.put(Boolean.class, CustomSwitchView.class);
+            mapClassView.put(Byte.class, CustomEditNumberView.class);
+            mapClassView.put(Short.class, CustomEditNumberView.class);
+            mapClassView.put(Integer.class, CustomEditNumberView.class);
+            mapClassView.put(Long.class, CustomEditNumberView.class);
+            mapClassView.put(Float.class, CustomEditNumberView.class);
+            mapClassView.put(Double.class, CustomEditNumberView.class);
+            mapClassView.put(BigInteger.class, CustomEditNumberView.class);
+            mapClassView.put(BigDecimal.class, CustomEditNumberView.class);
+            mapClassView.put(String.class, CustomEditTextView.class);
+            mapClassView.put(CharSequence.class, CustomEditTextView.class);
             // Definir converters
             componentConverters.put(Byte.class, Byte::parseByte);
             componentConverters.put(byte.class, Byte::parseByte);
