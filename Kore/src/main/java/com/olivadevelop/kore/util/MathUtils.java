@@ -13,9 +13,23 @@ public class MathUtils {
      */
     public static double roundUp(double value, int decimalCount) {
         if (decimalCount < 0) { throw new IllegalArgumentException("decimalCount debe ser >= 0"); }
-        BigDecimal bd = BigDecimal.valueOf(value);
-        bd = bd.setScale(decimalCount, RoundingMode.CEILING);
-        return bd.doubleValue();
+        return BigDecimal.valueOf(value).setScale(decimalCount, RoundingMode.CEILING).doubleValue();
     }
     public static double roundUp(double value) { return roundUp(value, 2); }
+    public static int clamp(int value, int min, int max) {
+        if (min > max) { throw new IllegalArgumentException(min + " > " + max); }
+        return Math.min(max, Math.max(value, min));
+    }
+    public static long clamp(long value, long min, long max) {
+        if (min > max) { throw new IllegalArgumentException(min + " > " + max); }
+        return Math.min(max, Math.max(value, min));
+    }
+    public static float clamp(float value, float min, float max) {
+        if (min > max) { throw new IllegalArgumentException(min + " > " + max); }
+        return Math.min(max, Math.max(value, min));
+    }
+    public static double clamp(double value, double min, double max) {
+        if (min > max) { throw new IllegalArgumentException(min + " > " + max); }
+        return Math.min(max, Math.max(value, min));
+    }
 }
