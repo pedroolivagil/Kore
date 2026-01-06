@@ -3,8 +3,11 @@ package com.olivadevelop.kore.activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.View;
 
@@ -17,6 +20,8 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.viewbinding.ViewBinding;
@@ -47,6 +52,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -154,6 +162,7 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
     protected void initListeners() { }
     protected void validations() { }
     protected void validateFailed() { }
+    protected LoaderWrapperBinding getLoaderWrapperBinding() { return null; }
     public final View getRoot() { return binding.getRoot(); }
     protected final void addClickListener(View v) { if (v != null) { v.setOnClickListener(this); } }
     @Override
@@ -241,20 +250,34 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
     public final void runWithLoader(ConstraintLayout loaderWrapper, DotLottieAnimation loaderAnim, Consumer<CustomLottieEventListener> listener) {
         loaderWrapper.setTranslationZ(9999);
         loaderWrapper.setVisibility(View.VISIBLE);
-        loaderWrapper.post(() ->
-                Animations.animate(loaderAnim, Animations.Instance.getLoaderAnim(), 250L, new CustomLottieEventListener() {
-                    @Override
-                    public void onPlay() {
-                        if (listener != null) {
-                            loaderAnim.removeEventListener(this);
-                            listener.accept(this);
-                            loaderWrapper.animate().setStartDelay(2500).alpha(0f).setDuration(150).withEndAction(() -> {
-                                loaderWrapper.setTranslationZ(0);
-                                loaderWrapper.setVisibility(View.GONE);
-                            }).start();
-                        }
-                    }
-                }));
+        loaderWrapper.post(() -> Animations.animate(loaderAnim, Animations.Instance.getLoaderAnim(), 250L, new CustomLottieEventListener() {
+            @Override
+            public void onPlay() {
+                if (listener != null) {
+                    loaderAnim.removeEventListener(this);
+                    listener.accept(this);
+                    loaderWrapper.animate().setStartDelay(2500).alpha(0f).setDuration(150).withEndAction(() -> {
+                        loaderWrapper.setTranslationZ(0);
+                        loaderWrapper.setVisibility(View.GONE);
+                    }).start();
+                }
+            }
+        }));
+    }
+    public final <X> void runWithLoaderAsync(Callable<X> work, Consumer<X> onFinish) {
+        if (getLoaderWrapperBinding() != null) {
+            getLoaderWrapperBinding().loaderWrapper.setTranslationZ(9999);
+            getLoaderWrapperBinding().loaderWrapper.setVisibility(View.VISIBLE);
+            Animations.animate(getLoaderWrapperBinding().loaderAnim, Animations.Instance.getLoaderAnim(), 350L);
+        }
+        AsyncExecutor.doAsync(work, onFinish.andThen((x) -> {
+            if (getLoaderWrapperBinding() != null) {
+                getLoaderWrapperBinding().loaderWrapper.animate().setStartDelay(250).alpha(0f).setDuration(150).withEndAction(() -> {
+                    getLoaderWrapperBinding().loaderWrapper.setTranslationZ(0);
+                    getLoaderWrapperBinding().loaderWrapper.setVisibility(View.GONE);
+                }).start();
+            }
+        }));
     }
     public final void loadFragment(Navigation.NavigationScreen screen, Bundle args) {
         Fragment fragment;
@@ -266,4 +289,43 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
         if (args != null) { fragment.setArguments(args); }
         getSupportFragmentManager().beginTransaction().replace(screen.getFragmentWrapper(), fragment).commit();
     }
+    public static class AsyncExecutor {
+        private static final ExecutorService IO = Executors.newSingleThreadExecutor();
+        private static final Handler mainHandler = new Handler(Looper.getMainLooper());
+        public static <T> void doAsync(Callable<T> work, Consumer<T> onResult) {
+            IO.execute(() -> {
+                try {
+                    T result = work.call();
+                    mainHandler.post(() -> onResult.accept(result));
+                } catch (Exception e) {
+                    Log.e(Constants.Log.TAG, "Error to execute async task", e);
+                }
+            });
+        }
+        public static void doAsync(Runnable run, Runnable onResult) {
+            IO.execute(() -> {
+                try {
+                    run.run();
+                } finally {
+                    mainHandler.post(() -> {
+                        if (Looper.myLooper() == Looper.getMainLooper()) {
+                            onResult.run();
+                        }
+                    });
+                }
+            });
+        }
+        public static void doAsync(LifecycleOwner owner, Runnable work, Runnable onUi) {
+            IO.execute(() -> {
+                work.run();
+                mainHandler.post(() -> {
+                    if (owner.getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                        onUi.run();
+                    }
+                });
+            });
+        }
+
+    }
+
 }
