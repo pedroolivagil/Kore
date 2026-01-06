@@ -50,6 +50,11 @@ public abstract class Constants {
         public static final String LABEL_FORM = "label_form_";
     }
 
+    public static class Animations {
+        public static final String INTRO = "INTRO";
+        public static final String LOADER = "LOADER";
+    }
+
     public static class Log {
         public static final String TAG = "//////////////////// COREUTILS LOG";
     }

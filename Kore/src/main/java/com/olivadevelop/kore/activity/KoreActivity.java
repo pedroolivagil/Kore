@@ -210,7 +210,6 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
     public final V initViewModel(Class<V> viewModel) { return new ViewModelProvider(this).get(viewModel); }
     public Optional<Bundle> getExtras() { return Optional.ofNullable(this.extras); }
     public Optional<NavigationBarView> getOptNavigationView() { return Optional.ofNullable(this.navigationView); }
-    protected LoaderWrapperBinding getLayoutLoaderWrapper() { return null; }
     public void goBack(Map<String, Object> args) { Navigation.Instance.goBack(this, args); }
     protected void showExitConfirmationDialog() {
         new MaterialAlertDialogBuilder(this).setTitle(R.string.exit_app_title).setMessage(R.string.exit_app_message).setPositiveButton(R.string.btn_exit,
@@ -247,28 +246,11 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
         }
         return result;
     }
-    public final void runWithLoader(ConstraintLayout loaderWrapper, DotLottieAnimation loaderAnim, Consumer<CustomLottieEventListener> listener) {
-        loaderWrapper.setTranslationZ(9999);
-        loaderWrapper.setVisibility(View.VISIBLE);
-        loaderWrapper.post(() -> Animations.animate(loaderAnim, Animations.Instance.getLoaderAnim(), 250L, new CustomLottieEventListener() {
-            @Override
-            public void onPlay() {
-                if (listener != null) {
-                    loaderAnim.removeEventListener(this);
-                    listener.accept(this);
-                    loaderWrapper.animate().setStartDelay(2500).alpha(0f).setDuration(150).withEndAction(() -> {
-                        loaderWrapper.setTranslationZ(0);
-                        loaderWrapper.setVisibility(View.GONE);
-                    }).start();
-                }
-            }
-        }));
-    }
     public final <X> void runWithLoaderAsync(Callable<X> work, Consumer<X> onFinish) {
         if (getLoaderWrapperBinding() != null) {
             getLoaderWrapperBinding().loaderWrapper.setTranslationZ(9999);
             getLoaderWrapperBinding().loaderWrapper.setVisibility(View.VISIBLE);
-            Animations.animate(getLoaderWrapperBinding().loaderAnim, Animations.Instance.getLoaderAnim(), 350L);
+            Animations.animate(getLoaderWrapperBinding().loaderAnim, Animations.Instance.getAnimations().get(Constants.Animations.LOADER), 350L);
         }
         AsyncExecutor.doAsync(work, onFinish.andThen((x) -> {
             if (getLoaderWrapperBinding() != null) {
