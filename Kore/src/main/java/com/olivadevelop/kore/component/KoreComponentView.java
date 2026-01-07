@@ -64,6 +64,8 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     private OnClick onClick;
     @Setter
     private boolean mandatory;
+    @Setter
+    private ComponentProperty componentProperty;
     @Setter(AccessLevel.PROTECTED)
     private PreferenceField preferenceKey;
     private boolean disabled;

@@ -115,15 +115,20 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         };
         BiConsumer<OrderPropertyOnView, Field> fieldConsumer = (opov, f) -> {
             int order = 0;
+            int group = 1;
             if (opov != null) {
                 Optional<OrderProperty> optOrder = Arrays.stream(opov.value()).filter(op -> op.value().equals(f.getName())).findFirst();
-                if (optOrder.isPresent()) { order = optOrder.get().position(); }
+                if (optOrder.isPresent()) {
+                    order = optOrder.get().position();
+                    group = optOrder.get().group();
+                }
             }
             properties.add(ComponentProperty.builder() //Builder
                     .componentClass(extractFromParametrizedType(f))
                     .property(f.getName())
                     .annotations(Arrays.stream(f.getDeclaredAnnotations()).collect(Collectors.toList()))
                     .order(order)
+                    .group(group)
                     .build());
         };
         OrderPropertyOnView opov = aClass.getDeclaredAnnotation(OrderPropertyOnView.class);
@@ -140,6 +145,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
             View view = classComponent.getDeclaredConstructor(Context.class, AttributeSet.class).newInstance(getCtx(), null);
             if (view instanceof KoreComponentView) {
                 KoreComponentView<?> component = (KoreComponentView<?>) view;
+                component.setComponentProperty(cp);
                 component.setProperty(Map.of(cp.getComponentClass(), cp.getAnnotations())).setTag(id);
                 component.setHint(buildHint(id));
                 component.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
@@ -157,8 +163,15 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                 getComponentViewMap().put(id, component);
             }
         } catch (Throwable e) {
-            Log.e(Constants.Log.TAG, "Error al crear el componente '" + id + "' ('" + cp.getComponentClass() + "') del viewmodel. " + e.getMessage(), e);
+            Log.e(Constants.Log.TAG, "Error al crear el componente '" + id + "' ('" + cp.getComponentClass() + "') del viewmodel. " + e.getMessage());
         }
+    }
+    public final List<KoreComponentView<?>> getComponentsFromGroup(int group) {
+        if (!getClass().isAnnotationPresent(OrderPropertyOnView.class)) { return new ArrayList<>(getComponentViewMap().values()); }
+        List<KoreComponentView<?>> result = new ArrayList<>();
+        getComponentViewMap().forEach((id, component) -> { if (component.getComponentProperty().getOrder() == group) { result.add(component); } });
+        result.sort(Comparator.comparingInt(c -> c.getComponentProperty().getOrder()));
+        return result;
     }
     private String buildHint(String id) {
         return Utils.translateStringIdFromResourceStrings(getCtx(), Constants.UI.LABEL_FORM + id, StringUtils.capitalize(id));
