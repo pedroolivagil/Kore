@@ -21,6 +21,7 @@ import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.annotation.RegularExpressionField;
 import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
 import com.olivadevelop.kore.preferences.PreferenceField;
+import com.olivadevelop.kore.preferences.PreferencesHelper;
 import com.olivadevelop.kore.util.AutoCalculateFormulaData;
 import com.olivadevelop.kore.util.Utils;
 
@@ -66,6 +67,8 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     private boolean mandatory;
     @Setter
     private ComponentProperty componentProperty;
+    @Setter
+    private boolean usePreferences;
     @Setter(AccessLevel.PROTECTED)
     private PreferenceField preferenceKey;
     private boolean disabled;
@@ -206,6 +209,7 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         configureFromLayout(cb.build());
         a.recycle();
     }
+    protected void updatePreferences(Object value) { PreferencesHelper.getInstance().add(getPreferenceKey(), value); }
     public interface OnValueChangeAutoCalcule {
         void run(Editable s);
     }

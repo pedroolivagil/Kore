@@ -15,9 +15,13 @@ import lombok.Getter;
 public final class PreferencesHelper {
     @Getter
     private static PreferencesHelper instance;
-    public static void init(Context c) { if (instance == null) { instance = new PreferencesHelper(c); } }
+    public static void init(IPreferenceProvider provider) {
+        if (instance == null) {
+            instance = new PreferencesHelper(provider.getContext(), provider.getName());
+        }
+    }
     private final PreferencesManager manager;
-    private PreferencesHelper(Context c) { this.manager = new PreferencesManager(c, "TinySipsPreferences"); }
+    private PreferencesHelper(Context c, String name) { this.manager = new PreferencesManager(c, name); }
     public void add(PreferenceField field, Object value) {
         SharedPreferences.Editor editor = this.manager.editor();
         if (value instanceof Integer) {

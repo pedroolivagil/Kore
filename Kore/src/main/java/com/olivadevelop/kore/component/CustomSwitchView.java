@@ -15,7 +15,8 @@ public class CustomSwitchView extends KoreComponentView<CompCustomSwitchBinding>
         super(context, attrs);
         getBinding().getRoot().setOnClickListener(v -> getBinding().toggleButton.performClick());
         getBinding().toggleButton.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            PreferencesHelper.getInstance().add(getPreferenceKey(), isChecked);
+            if (isUsePreferences()) { updatePreferences(isChecked); }
+            setValue(isChecked);
             if (getOnValueChange() != null) { getOnValueChange().run(this); }
         });
     }
@@ -45,7 +46,7 @@ public class CustomSwitchView extends KoreComponentView<CompCustomSwitchBinding>
             getBinding().txtSubtitle.setTypeface(getBinding().txtSubtitle.getTypeface(), c.getValueTextStyle());
             getBinding().txtSubtitle.setTextSize(Dimension.SP, c.getValueTextSize());
         }
-        if (getPreferenceKey() != null) {
+        if (isUsePreferences() && getPreferenceKey() != null) {
             PreferencesHelper.getInstance().get(getPreferenceKey()).ifPresentOrElse(value -> getBinding().toggleButton.setChecked((Boolean) value), () -> {
                 PreferencesHelper.getInstance().add(getPreferenceKey(), c.isChecked());
                 getBinding().toggleButton.setChecked(c.isChecked());
