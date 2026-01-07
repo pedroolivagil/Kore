@@ -169,7 +169,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
     public final List<KoreComponentView<?>> getComponentsFromGroup(int group) {
         if (!getClass().isAnnotationPresent(OrderPropertyOnView.class)) { return new ArrayList<>(getComponentViewMap().values()); }
         List<KoreComponentView<?>> result = new ArrayList<>();
-        getComponentViewMap().forEach((id, component) -> { if (component.getComponentProperty().getOrder() == group) { result.add(component); } });
+        getComponentViewMap().forEach((id, component) -> { if (component.getComponentProperty().getGroup() == group) { result.add(component); } });
         result.sort(Comparator.comparingInt(c -> c.getComponentProperty().getOrder()));
         return result;
     }
