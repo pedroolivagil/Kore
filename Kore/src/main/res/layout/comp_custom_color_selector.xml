@@ -14,8 +14,13 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/rounded_background_8_stroke_pink_light"
+                android:background="@drawable/rounded_background_8_stroke_white_light"
                 android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/required_warning_label"
+                    style="@style/Theme.Kore.FieldRequiredText"
+                    android:text="@string/field_required" />
 
                 <LinearLayout
                     android:id="@+id/wrapper_color_max"
@@ -123,11 +128,6 @@
                         app:srcCompat="@drawable/ic_expand" />
                 </LinearLayout>
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/required_warning_label"
-                style="@style/Theme.Kore.FieldRequiredText"
-                android:text="@string/field_required" />
 
             <View
                 android:layout_width="match_parent"
