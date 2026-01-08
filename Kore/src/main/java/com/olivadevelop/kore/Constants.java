@@ -33,7 +33,7 @@ public abstract class Constants {
     }
 
     public static class Provider {
-        public static final String CAMERA_PROVIDER = "com.olivadevelop.coreutils.provider";
+        public static final String CAMERA_PROVIDER = "com.olivadevelop.kore.provider";
     }
 
     public static class IntentParam {

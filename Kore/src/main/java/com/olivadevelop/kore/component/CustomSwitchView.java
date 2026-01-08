@@ -21,9 +21,9 @@ public class CustomSwitchView extends KoreComponentView<CompCustomSwitchBinding>
         });
     }
     @Override
-    public void setHint(String hint) { getBinding().toggleButton.setText(hint); }
+    public void setHint(String hint) { getBinding().txtTitle.setText(hint); }
     @Override
-    public String getHint() { return String.valueOf(getBinding().toggleButton.getHint()); }
+    public String getHint() { return String.valueOf(getBinding().txtTitle.getText()); }
     @Override
     public void setValue(Object s) { if (s instanceof Boolean) { getBinding().toggleButton.setChecked((boolean) s); } }
     public final boolean isActive() { return getBinding().toggleButton.isChecked(); }
