@@ -12,8 +12,10 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import androidx.annotation.ColorRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.MutableLiveData;
 import androidx.viewbinding.ViewBinding;
 
 import com.olivadevelop.kore.R;
@@ -69,6 +71,7 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     private ComponentProperty componentProperty;
     @Setter
     private boolean usePreferences;
+    private MutableLiveData<Object> liveData;
     @Setter(AccessLevel.PROTECTED)
     private PreferenceField preferenceKey;
     private boolean disabled;
@@ -141,15 +144,6 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         if (getDisabledOverlay() != null) { getDisabledOverlay().getRoot().setVisibility(this.disabled ? View.VISIBLE : View.GONE); }
     }
     @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        KoreComponentView<?> that = (KoreComponentView<?>) o;
-        return this.mandatory == that.mandatory && Objects.equals(this.binding, that.binding) && Objects.equals(this.regexPattern, that.regexPattern) && Objects.equals(this.property, that.property) && Objects.equals(this.koreActivity, that.koreActivity);
-    }
-    @Override
-    public int hashCode() { return Objects.hash(this.mandatory, this.binding, this.regexPattern, this.property, this.koreActivity); }
-    @Override
     public void onClick(View v) { }
     @Override
     public boolean onTouch(View v, MotionEvent event) { return false; }
@@ -210,6 +204,19 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         a.recycle();
     }
     protected void updatePreferences(Object value) { PreferencesHelper.getInstance().add(getPreferenceKey(), value); }
+    public void setLiveData(@NonNull MutableLiveData<Object> liveData) {
+        this.liveData = liveData;
+        liveData.observe(this.koreActivity, this::setValue);
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) { return false; }
+        KoreComponentView<?> that = (KoreComponentView<?>) o;
+        return this.mandatory == that.mandatory && Objects.equals(this.binding, that.binding) && Objects.equals(this.regexPattern, that.regexPattern) && Objects.equals(this.property, that.property) && Objects.equals(this.koreActivity, that.koreActivity);
+    }
+    @Override
+    public int hashCode() { return Objects.hash(this.mandatory, this.binding, this.regexPattern, this.property, this.koreActivity); }
     public interface OnValueChangeAutoCalcule {
         void run(Editable s);
     }

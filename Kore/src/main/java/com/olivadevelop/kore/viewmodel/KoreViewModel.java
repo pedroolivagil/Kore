@@ -58,7 +58,11 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
     private boolean hasValidation = true;
     private Map<String, KoreComponentView<?>> componentViewMap = new HashMap<>();
     private Set<InvalidPropertyErrorVM> errors = new HashSet<>();
-    public KoreViewModel() { buildNewData(); }
+    private final Map<String, MutableLiveData<Object>> fieldLiveDataMap = new HashMap<>();
+    public KoreViewModel() {
+        initLiveDataMap();
+        buildNewData();
+    }
     public boolean isValid() { return false; }
     public KoreViewModel<T> buildEntityData() { return null; }
     public void reload() { buildNewData(); }
@@ -78,6 +82,15 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                 f.setAccessible(true);
                 f.set(this, f.get(viewModel));
             } catch (IllegalAccessException e) { Log.e(Constants.Log.TAG, "Error al recuperar el estado anterior del viewmodel. " + e.getMessage()); }
+        });
+    }
+    private void initLiveDataMap() {
+        Predicate<Field> filter = f -> MutableLiveData.class.isAssignableFrom(f.getType());
+        FieldUtils.getAllFieldsList(getClass()).stream().filter(filter).forEach(f -> {
+            try {
+                f.setAccessible(true);
+                fieldLiveDataMap.put(f.getName().toLowerCase(), (MutableLiveData<Object>) f.get(this));
+            } catch (IllegalAccessException ignored) { }
         });
     }
 
@@ -124,12 +137,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                 }
             }
             properties.add(ComponentProperty.builder() //Builder
-                    .componentClass(extractFromParametrizedType(f))
-                    .property(f.getName())
-                    .annotations(Arrays.stream(f.getDeclaredAnnotations()).collect(Collectors.toList()))
-                    .order(order)
-                    .group(group)
-                    .build());
+                    .componentClass(extractFromParametrizedType(f)).property(f.getName()).annotations(Arrays.stream(f.getDeclaredAnnotations()).collect(Collectors.toList())).order(order).group(group).build());
         };
         OrderPropertyOnView opov = aClass.getDeclaredAnnotation(OrderPropertyOnView.class);
         FieldUtils.getAllFieldsList(aClass).stream().filter(filterIgnore).forEach(f -> fieldConsumer.accept(opov, f));
@@ -169,11 +177,23 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
     public final List<KoreComponentView<?>> getComponentsFromGroup(int group) {
         if (!getClass().isAnnotationPresent(OrderPropertyOnView.class)) { return new ArrayList<>(getComponentViewMap().values()); }
         List<KoreComponentView<?>> result = new ArrayList<>();
-        getComponentViewMap().forEach((id, component) -> { if (component.getComponentProperty().getGroup() == group) { result.add(component); } });
+        getComponentViewMap().forEach((id, component) -> {
+            if (component.getComponentProperty().getGroup() == group) {
+                component.setOnValueChange(s -> fillFieldLiveData(id, s));
+                result.add(component);
+            }
+        });
         result.sort(Comparator.comparingInt(c -> c.getComponentProperty().getOrder()));
         return result;
     }
     private String buildHint(String id) {
         return Utils.translateStringIdFromResourceStrings(getCtx(), Constants.UI.LABEL_FORM + id, StringUtils.capitalize(id));
+    }
+    public final void fillFieldLiveData(String id, KoreComponentView<?> component) {
+        MutableLiveData<Object> liveData = fieldLiveDataMap.get(id.toLowerCase());
+        if (liveData != null) {
+            if (component.getLiveData() == null) { component.setLiveData(liveData); }
+            if (!Objects.equals(liveData.getValue(), component.getValue())) { liveData.setValue(component.getValue()); }
+        }
     }
 }
