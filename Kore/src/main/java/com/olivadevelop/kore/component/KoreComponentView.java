@@ -65,7 +65,6 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     private OnValueChange onValueChange;
     @Setter
     private OnClick onClick;
-    @Setter
     private boolean mandatory;
     @Setter
     private ComponentProperty componentProperty;
@@ -151,7 +150,7 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     protected void configureFromLayout(ComponentAttributes c) { }
     protected void previewEditMode(ComponentAttributes c) { configureFromLayout(c); }
     protected DisabledOverlayBinding getDisabledOverlay() { return null; }
-    protected View getRequiredViewWarning() { return null; }
+    public View getRequiredViewWarning() { return null; }
     public Object getValue() { return null; }
     public void setValue(Object s) { }
     public void clearValue() { }
@@ -178,8 +177,29 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         int defaultBoxStrokeColor = context.getResources().getColor(R.color.gray, context.getTheme());
         if (isInEditMode()) {
             String namespace = "http://schemas.android.com/app";
-            ComponentAttributes.ComponentAttributesBuilder cb = ComponentAttributes.builder().checked(ComponentAttributes.getBoolean(attrs, namespace,
-                    "checked", false)).enabled(ComponentAttributes.getBoolean(attrs, namespace, "enabled", true)).preferenceKey(attrs.getAttributeValue(namespace, "preferenceKey")).preferenceType(attrs.getAttributeIntValue(R.styleable.KoreComponentView_preferenceType, -1)).subtitle(attrs.getAttributeValue(namespace, "subtitle")).hintText(attrs.getAttributeValue(namespace, "hintText")).borderColor(ComponentAttributes.getInt(attrs, namespace, "borderColor", defaultBorderColor)).textColor(ComponentAttributes.getInt(attrs, namespace, "textColor", defaultTextColor)).textSize(ComponentAttributes.getFloat(attrs, namespace, "textSize", defaultTextSize)).textStyle(ComponentAttributes.getInt(attrs, namespace, "textStyle", defaultTextStyle)).title(attrs.getAttributeValue(namespace, "title")).value(attrs.getAttributeValue(namespace, "value")).valueProperties(attrs.getAttributeValue(namespace, "valueProperties")).valueTextColor(ComponentAttributes.getInt(attrs, namespace, "valueTextColor", defaultTextColor)).valueTextSize(ComponentAttributes.getFloat(attrs, namespace, "valueTextSize", defaultTextSize)).valueTextStyle(ComponentAttributes.getInt(attrs, namespace, "valueTextStyle", defaultTextStyle)).mandatory(ComponentAttributes.getBoolean(attrs, namespace, "mandatory", false)).errorEnabled(ComponentAttributes.getBoolean(attrs, namespace, "errorEnabled", false)).hintTextColor(ComponentAttributes.getInt(attrs, namespace, "hintTextColor", defaultTextColor)).boxStrokeColor(ComponentAttributes.getInt(attrs, namespace, "borderColor", defaultBoxStrokeColor)).startIconDrawable(attrs.getAttributeResourceValue(namespace, "startIconDrawable", -1)).startIconTint(ComponentAttributes.getInt(attrs, namespace, "startIconTint", -1));
+            ComponentAttributes.ComponentAttributesBuilder cb = ComponentAttributes.builder()
+                    .checked(ComponentAttributes.getBoolean(attrs, namespace, "checked", false))
+                    .enabled(ComponentAttributes.getBoolean(attrs, namespace, "enabled", true))
+                    .preferenceKey(attrs.getAttributeValue(namespace, "preferenceKey"))
+                    .preferenceType(attrs.getAttributeIntValue(R.styleable.KoreComponentView_preferenceType, -1))
+                    .subtitle(attrs.getAttributeValue(namespace, "subtitle"))
+                    .hintText(attrs.getAttributeValue(namespace, "hintText"))
+                    .borderColor(ComponentAttributes.getInt(attrs, namespace, "borderColor", defaultBorderColor))
+                    .textColor(ComponentAttributes.getInt(attrs, namespace, "textColor", defaultTextColor))
+                    .textSize(ComponentAttributes.getFloat(attrs, namespace, "textSize", defaultTextSize))
+                    .textStyle(ComponentAttributes.getInt(attrs, namespace, "textStyle", defaultTextStyle))
+                    .title(attrs.getAttributeValue(namespace, "title"))
+                    .value(attrs.getAttributeValue(namespace, "value"))
+                    .valueProperties(attrs.getAttributeValue(namespace, "valueProperties"))
+                    .valueTextColor(ComponentAttributes.getInt(attrs, namespace, "valueTextColor", defaultTextColor))
+                    .valueTextSize(ComponentAttributes.getFloat(attrs, namespace, "valueTextSize", defaultTextSize))
+                    .valueTextStyle(ComponentAttributes.getInt(attrs, namespace, "valueTextStyle", defaultTextStyle))
+                    .mandatory(ComponentAttributes.getBoolean(attrs, namespace, "mandatory", false))
+                    .errorEnabled(ComponentAttributes.getBoolean(attrs, namespace, "errorEnabled", false))
+                    .hintTextColor(ComponentAttributes.getInt(attrs, namespace, "hintTextColor", defaultTextColor))
+                    .boxStrokeColor(ComponentAttributes.getInt(attrs, namespace, "borderColor", defaultBoxStrokeColor))
+                    .startIconDrawable(attrs.getAttributeResourceValue(namespace, "startIconDrawable", -1))
+                    .startIconTint(ComponentAttributes.getInt(attrs, namespace, "startIconTint", -1));
             if (cb.valueProperties != null && cb.valueProperties.isEmpty()) {
                 String[] properties = cb.valueProperties.split(";");
                 if (cb.value.contains("%s") && properties.length > 0) {
@@ -190,7 +210,28 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         }
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.KoreComponentView);
         ComponentAttributes.ComponentAttributesBuilder cb =
-                ComponentAttributes.builder().checked(a.getBoolean(R.styleable.KoreComponentView_checked, false)).enabled(a.getBoolean(R.styleable.KoreComponentView_enabled, true)).preferenceKey(a.getString(R.styleable.KoreComponentView_preferenceKey)).preferenceType(a.getInt(R.styleable.KoreComponentView_preferenceType, -1)).subtitle(a.getString(R.styleable.KoreComponentView_subtitle)).borderColor(a.getColor(R.styleable.KoreComponentView_borderColor, defaultBorderColor)).textColor(a.getColor(R.styleable.KoreComponentView_textColor, defaultTextColor)).textSize(a.getDimension(R.styleable.KoreComponentView_textSize, defaultTextSize)).textStyle(a.getInt(R.styleable.KoreComponentView_textStyle, defaultTextStyle)).title(a.getString(R.styleable.KoreComponentView_title)).value(a.getString(R.styleable.KoreComponentView_value)).valueProperties(a.getString(R.styleable.KoreComponentView_valueProperties)).valueTextColor(a.getColor(R.styleable.KoreComponentView_valueTextColor, defaultTextColor)).valueTextSize(a.getDimension(R.styleable.KoreComponentView_valueTextSize, defaultTextSize)).valueTextStyle(a.getInt(R.styleable.KoreComponentView_valueTextStyle, defaultTextStyle)).mandatory(a.getBoolean(R.styleable.KoreComponentView_mandatory, false)).errorEnabled(a.getBoolean(R.styleable.KoreComponentView_errorEnabled, false)).hintTextColor(a.getColor(R.styleable.KoreComponentView_hintTextColor, defaultTextColor)).boxStrokeColor(a.getColor(R.styleable.KoreComponentView_borderColor, defaultBoxStrokeColor)).startIconDrawable(a.getResourceId(R.styleable.KoreComponentView_startIconDrawable, -1)).startIconTint(a.getColor(R.styleable.KoreComponentView_startIconTint, -1)).hintText(a.getString(R.styleable.KoreComponentView_hintText));
+                ComponentAttributes.builder().checked(a.getBoolean(R.styleable.KoreComponentView_checked, false))
+                        .enabled(a.getBoolean(R.styleable.KoreComponentView_enabled, true))
+                        .preferenceKey(a.getString(R.styleable.KoreComponentView_preferenceKey))
+                        .preferenceType(a.getInt(R.styleable.KoreComponentView_preferenceType, -1))
+                        .subtitle(a.getString(R.styleable.KoreComponentView_subtitle))
+                        .borderColor(a.getColor(R.styleable.KoreComponentView_borderColor, defaultBorderColor))
+                        .textColor(a.getColor(R.styleable.KoreComponentView_textColor, defaultTextColor))
+                        .textSize(a.getDimension(R.styleable.KoreComponentView_textSize, defaultTextSize))
+                        .textStyle(a.getInt(R.styleable.KoreComponentView_textStyle, defaultTextStyle))
+                        .title(a.getString(R.styleable.KoreComponentView_title))
+                        .value(a.getString(R.styleable.KoreComponentView_value))
+                        .valueProperties(a.getString(R.styleable.KoreComponentView_valueProperties))
+                        .valueTextColor(a.getColor(R.styleable.KoreComponentView_valueTextColor, defaultTextColor))
+                        .valueTextSize(a.getDimension(R.styleable.KoreComponentView_valueTextSize, defaultTextSize))
+                        .valueTextStyle(a.getInt(R.styleable.KoreComponentView_valueTextStyle, defaultTextStyle))
+                        .mandatory(a.getBoolean(R.styleable.KoreComponentView_mandatory, false))
+                        .errorEnabled(a.getBoolean(R.styleable.KoreComponentView_errorEnabled, false))
+                        .hintTextColor(a.getColor(R.styleable.KoreComponentView_hintTextColor, defaultTextColor))
+                        .boxStrokeColor(a.getColor(R.styleable.KoreComponentView_borderColor, defaultBoxStrokeColor))
+                        .startIconDrawable(a.getResourceId(R.styleable.KoreComponentView_startIconDrawable, -1))
+                        .startIconTint(a.getColor(R.styleable.KoreComponentView_startIconTint, -1))
+                        .hintText(a.getString(R.styleable.KoreComponentView_hintText));
         if (cb.valueProperties != null && !cb.valueProperties.isEmpty()) {
             String[] properties = cb.valueProperties.split(";");
             if (cb.value.contains("%s") && properties.length > 0) {
@@ -207,6 +248,11 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     public void setLiveData(@NonNull MutableLiveData<Object> liveData) {
         this.liveData = liveData;
         liveData.observe(this.koreActivity, this::setValue);
+    }
+    public void setMandatory(boolean mandatory) {
+        this.mandatory = mandatory;
+        if (getRequiredViewWarning() == null) { return; }
+        getRequiredViewWarning().setVisibility(this.mandatory ? View.VISIBLE : View.GONE);
     }
     @Override
     public boolean equals(Object o) {

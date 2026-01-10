@@ -1,5 +1,7 @@
 package com.olivadevelop.kore.util;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ArgbEvaluator;
 import android.animation.ObjectAnimator;
@@ -24,6 +26,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 
 import androidx.annotation.ColorInt;
@@ -383,7 +386,32 @@ public abstract class Utils {
             view.animate().translationX(toRight ? 50 : -50)   // desplazamiento pequeño
                     .setDuration(60).withEndAction(() -> view.animate().translationX(0).setDuration(60)).start();
         }
-
+        public static void interpolation(View view, int duration, float scaleMax) {
+            interpolation(view, duration, scaleMax, 0);
+        }
+        public static void interpolation(View view, int duration, float scaleMax, long delay) {
+            interpolation(view, duration, 0, scaleMax, 1, delay);
+        }
+        public static void interpolation(View view, int duration, float scaleMin, float scaleMax, float finalScale, long delay) {
+            interpolation(view, duration, scaleMin, scaleMax, finalScale, delay, null);
+        }
+        public static void interpolation(View view, int duration, float scaleMin, float scaleMax, float finalScale, long delay, Runnable actionOnFinish) {
+            view.setScaleX(scaleMin);
+            view.setScaleY(scaleMin);
+            ObjectAnimator scaleX = ObjectAnimator.ofFloat(view, "scaleX", scaleMin, scaleMax, finalScale);
+            ObjectAnimator scaleY = ObjectAnimator.ofFloat(view, "scaleY", scaleMin, scaleMax, finalScale);
+            scaleX.setInterpolator(new OvershootInterpolator());
+            scaleY.setInterpolator(new OvershootInterpolator());
+            AnimatorSet animatorSet = new AnimatorSet();
+            animatorSet.playTogether(scaleX, scaleY);
+            animatorSet.setDuration(duration);
+            animatorSet.setStartDelay(delay);
+            animatorSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) { if (actionOnFinish != null) { actionOnFinish.run(); } }
+            });
+            animatorSet.start();
+        }
     }
 
     @SuppressWarnings("unchecked")

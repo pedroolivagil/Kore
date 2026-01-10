@@ -42,7 +42,7 @@ public class CustomImageSelector extends KoreComponentView<CompCustomImageSelect
     @Override
     public Object getValue() { return photoUri != null ? photoUri.getPath() : null; }
     @Override
-    protected View getRequiredViewWarning() { return getBinding().requiredWarningLabel; }
+    public View getRequiredViewWarning() { return getBinding().requiredWarningLabel; }
     @Override
     protected DisabledOverlayBinding getDisabledOverlay() { return getBinding().disabledView; }
     @Override

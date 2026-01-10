@@ -159,7 +159,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                 component.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
                 component.setVisibility(View.VISIBLE);
                 component.setActivity(getCtx());
-                component.setMandatory(true);
+                component.setMandatory(false);
                 cp.getAnnotations().stream().filter(a -> a instanceof RegularExpressionField).map(a -> (RegularExpressionField) a).findFirst().ifPresent(a -> {
                     component.setMandatory(a.mandatory());
                     component.setMaxLines(a.maxLines());

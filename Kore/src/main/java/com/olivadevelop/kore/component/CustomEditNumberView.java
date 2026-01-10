@@ -35,7 +35,7 @@ public class CustomEditNumberView extends KoreComponentView<CompCustomEditTextBi
     @Override
     public Object getValue() { return getText(); }
     @Override
-    protected View getRequiredViewWarning() { return getBinding().requiredWarningLabel; }
+    public View getRequiredViewWarning() { return getBinding().requiredWarningLabel; }
     @Override
     protected DisabledOverlayBinding getDisabledOverlay() { return getBinding().disabledView; }
     @Override

@@ -80,7 +80,7 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
     @Override
     public Object getValue() { return this.colorSelected; }
     @Override
-    protected View getRequiredViewWarning() { return getBinding().requiredWarningLabel; }
+    public View getRequiredViewWarning() { return getBinding().requiredWarningLabel; }
     @Override
     protected DisabledOverlayBinding getDisabledOverlay() { return getBinding().disabledView; }
     @Override
