@@ -87,7 +87,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
     }
     private void initLiveDataMap() {
         Predicate<Field> filter = f -> MutableLiveData.class.isAssignableFrom(f.getType());
-        FieldUtils.getAllFieldsList(getClass()).stream().filter(filter).forEach(f -> fieldLiveDataMap.put(f.getName().toLowerCase(), f));
+        FieldUtils.getAllFieldsList(getClass()).stream().filter(filter).forEach(f -> fieldLiveDataMap.put(f.getName(), f));
     }
 
     @NonNull
