@@ -245,10 +245,7 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         a.recycle();
     }
     protected void updatePreferences(Object value) { PreferencesHelper.getInstance().add(getPreferenceKey(), value); }
-    public void setLiveData(@NonNull MutableLiveData<Object> liveData) {
-        this.liveData = liveData;
-        liveData.observe(this.koreActivity, this::setValue);
-    }
+    public void setLiveData(@NonNull MutableLiveData<Object> liveData) { this.liveData = liveData; }
     public void setMandatory(boolean mandatory) {
         this.mandatory = mandatory;
         if (getRequiredViewWarning() == null) { return; }
