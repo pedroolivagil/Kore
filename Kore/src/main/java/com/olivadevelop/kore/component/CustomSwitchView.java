@@ -28,6 +28,8 @@ public class CustomSwitchView extends KoreComponentView<CompCustomSwitchBinding>
     public void setValue(Object s) { if (s instanceof Boolean) { getBinding().toggleButton.setChecked((boolean) s); } }
     public final boolean isActive() { return getBinding().toggleButton.isChecked(); }
     @Override
+    public Object getValue() { return isActive(); }
+    @Override
     protected void previewEditMode(ComponentAttributes c) {
         super.previewEditMode(c);
         getBinding().toggleButton.setChecked(c.isChecked());

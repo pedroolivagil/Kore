@@ -62,6 +62,8 @@ public class CustomEditNumberView extends KoreComponentView<CompCustomEditTextBi
         getBinding().textInputLayout.setErrorIconDrawable(R.drawable.ic_error_min);
     }
     @Override
+    protected void whenAfterTextChanged(Editable e) { super.setValue(e.toString()); }
+    @Override
     protected void whenRegexIsValid() { getBinding().textInputLayout.setError(null); }
     @Override
     public void setMaxLines(int maxLines) { editTextToValidate().setMaxLines(maxLines); }
