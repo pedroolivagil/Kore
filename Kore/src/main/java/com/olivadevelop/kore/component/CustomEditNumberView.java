@@ -62,7 +62,10 @@ public class CustomEditNumberView extends KoreComponentView<CompCustomEditTextBi
         getBinding().textInputLayout.setErrorIconDrawable(R.drawable.ic_error_min);
     }
     @Override
-    protected void whenAfterTextChanged(Editable e) { super.setValue(e.toString()); }
+    protected void whenAfterTextChanged(Editable e) {
+        super.setValue(e.toString());
+        if (getOnValueChange() != null) { getOnValueChange().run(this); }
+    }
     @Override
     protected void whenRegexIsValid() { getBinding().textInputLayout.setError(null); }
     @Override

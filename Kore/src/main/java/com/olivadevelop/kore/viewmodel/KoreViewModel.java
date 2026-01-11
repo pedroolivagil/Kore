@@ -180,6 +180,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         getComponentViewMap().forEach((id, component) -> {
             if (component.getComponentProperty().getGroup() == group) {
                 component.setOnValueChange(s -> fillFieldLiveData(id, s));
+                fillFieldLiveData(id, component);
                 result.add(component);
             }
         });

@@ -64,8 +64,8 @@ public class CustomImageSelector extends KoreComponentView<CompCustomImageSelect
     private void processIntentMediaGallery(Intent data) {
         if (data == null || data.getData() == null) { return; }
         try {
-            processMediaImage(data.getData());
             this.photoUri = data.getData();
+            processMediaImage(data.getData());
         } catch (FileNotFoundException e) {
             Log.e(Constants.Log.TAG, "Error on select image from preview color. TRACE: " + e.getMessage());
         }
@@ -79,5 +79,6 @@ public class CustomImageSelector extends KoreComponentView<CompCustomImageSelect
     }
     private void processMediaImage(Uri imageUri) throws FileNotFoundException {
         CameraGalleryImageManager.loadImage(imageUri, getBinding().imagePreview);
+        if (getOnValueChange() != null) { getOnValueChange().run(this); }
     }
 }

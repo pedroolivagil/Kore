@@ -172,6 +172,7 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
         getBinding().brightnessSlide.setVisibility(View.GONE);
         getBinding().btnResetColor.setVisibility(View.GONE);
         getBinding().btnClearImage.setVisibility(View.VISIBLE);
+        if (getOnValueChange() != null) { getOnValueChange().run(this); }
     }
     private void toggleComponent() {
         ViewGroup parent;
