@@ -189,6 +189,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         Field fieldLiveData = fieldLiveDataMap.get(id);
         if (fieldLiveData == null) { return; }
         try {
+            fieldLiveData.setAccessible(true);
             MutableLiveData<Object> liveData = (MutableLiveData<Object>) fieldLiveData.get(this);
             if (liveData != null) {
                 if (component.getLiveData() == null) { component.setLiveData(liveData); }
