@@ -58,7 +58,8 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
     private boolean hasValidation = true;
     private Map<String, KoreComponentView<?>> componentViewMap = new HashMap<>();
     private Set<InvalidPropertyErrorVM> errors = new HashSet<>();
-    private final Map<String, MutableLiveData<Object>> fieldLiveDataMap = new HashMap<>();
+    //    private final Map<String, MutableLiveData<Object>> fieldLiveDataMap = new HashMap<>();
+    private final Map<String, Field> fieldLiveDataMap = new HashMap<>();
     public KoreViewModel() {
         initLiveDataMap();
         buildNewData();
@@ -86,12 +87,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
     }
     private void initLiveDataMap() {
         Predicate<Field> filter = f -> MutableLiveData.class.isAssignableFrom(f.getType());
-        FieldUtils.getAllFieldsList(getClass()).stream().filter(filter).forEach(f -> {
-            try {
-                f.setAccessible(true);
-                fieldLiveDataMap.put(f.getName().toLowerCase(), (MutableLiveData<Object>) f.get(this));
-            } catch (IllegalAccessException ignored) { }
-        });
+        FieldUtils.getAllFieldsList(getClass()).stream().filter(filter).forEach(f -> fieldLiveDataMap.put(f.getName().toLowerCase(), f));
     }
 
     @NonNull
@@ -180,7 +176,6 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         getComponentViewMap().forEach((id, component) -> {
             if (component.getComponentProperty().getGroup() == group) {
                 component.setOnValueChange(s -> fillFieldLiveData(id, s));
-                fillFieldLiveData(id, component);
                 result.add(component);
             }
         });
@@ -191,10 +186,14 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         return Utils.translateStringIdFromResourceStrings(getCtx(), Constants.UI.LABEL_FORM + id, StringUtils.capitalize(id));
     }
     public final void fillFieldLiveData(String id, KoreComponentView<?> component) {
-        MutableLiveData<Object> liveData = fieldLiveDataMap.get(id.toLowerCase());
-        if (liveData != null) {
-            if (component.getLiveData() == null) { component.setLiveData(liveData); }
-            if (!Objects.equals(liveData.getValue(), component.getValue())) { liveData.setValue(component.getValue()); }
-        }
+        Field fieldLiveData = fieldLiveDataMap.get(id);
+        if (fieldLiveData == null) { return; }
+        try {
+            MutableLiveData<Object> liveData = (MutableLiveData<Object>) fieldLiveData.get(this);
+            if (liveData != null) {
+                if (component.getLiveData() == null) { component.setLiveData(liveData); }
+                if (!Objects.equals(liveData.getValue(), component.getValue())) { liveData.setValue(component.getValue()); }
+            }
+        } catch (IllegalAccessException ignored) { }
     }
 }
