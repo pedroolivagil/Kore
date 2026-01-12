@@ -41,6 +41,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -161,7 +162,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                     component.setMaxLines(a.maxLines());
                     component.setMaxLength(a.maxLength());
                     component.setMinLength(a.minLength());
-                    component.setImmediateValidation(a.inmediateValidation());
+                    component.setImmediateValidation(a.immediateValidation());
                     component.setRegexPattern(a.value());
                 });
                 getComponentViewMap().put(id, component);
@@ -169,6 +170,9 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         } catch (Throwable e) {
             Log.e(Constants.Log.TAG, "Error al crear el componente '" + id + "' ('" + cp.getComponentClass() + "') del viewmodel. " + e.getMessage());
         }
+    }
+    private String buildHint(String id) {
+        return Utils.translateStringIdFromResourceStrings(getCtx(), Constants.UI.LABEL_FORM + id, StringUtils.capitalize(id));
     }
     public final List<KoreComponentView<?>> getComponentsFromGroup(int group) {
         if (!getClass().isAnnotationPresent(OrderPropertyOnView.class)) { return new ArrayList<>(getComponentViewMap().values()); }
@@ -182,8 +186,19 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         result.sort(Comparator.comparingInt(c -> c.getComponentProperty().getOrder()));
         return result;
     }
-    private String buildHint(String id) {
-        return Utils.translateStringIdFromResourceStrings(getCtx(), Constants.UI.LABEL_FORM + id, StringUtils.capitalize(id));
+    public final void addValidation(String idComponent, Function<KoreComponentView<?>, Boolean> validation) {
+        if (getComponentViewMap() == null || getComponentViewMap().get(idComponent) == null || validation == null) {
+            Log.e(Constants.Log.TAG, "Cannot add validation on null objects");
+            return;
+        }
+        addValidation(getComponentViewMap().get(idComponent), validation);
+    }
+    public final void addValidation(KoreComponentView<?> component, Function<KoreComponentView<?>, Boolean> validation) {
+        if (component == null || validation == null) {
+            Log.e(Constants.Log.TAG, "Cannot add validation on null objects");
+            return;
+        }
+        component.setValidation(validation);
     }
     public final void fillFieldLiveData(String id, KoreComponentView<?> component) {
         Field fieldLiveData = fieldLiveDataMap.get(id);
@@ -191,10 +206,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         try {
             fieldLiveData.setAccessible(true);
             MutableLiveData<Object> liveData = (MutableLiveData<Object>) fieldLiveData.get(this);
-            if (liveData != null) {
-                if (component.getLiveData() == null) { component.setLiveData(liveData); }
-                if (!Objects.equals(liveData.getValue(), component.getValue())) { liveData.setValue(component.getValue()); }
-            }
+            if (liveData != null) { if (!Objects.equals(liveData.getValue(), component.getValue())) { liveData.setValue(component.getValue()); } }
         } catch (IllegalAccessException ignored) { }
     }
 }

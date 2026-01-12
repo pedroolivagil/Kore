@@ -12,10 +12,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import androidx.annotation.ColorRes;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.MutableLiveData;
 import androidx.viewbinding.ViewBinding;
 
 import com.olivadevelop.kore.R;
@@ -33,6 +31,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 import lombok.AccessLevel;
@@ -65,14 +64,15 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     private OnValueChange onValueChange;
     @Setter
     private OnClick onClick;
-    private boolean mandatory;
     @Setter
     private ComponentProperty componentProperty;
     @Setter
     private boolean usePreferences;
-    private MutableLiveData<Object> liveData;
+    @Setter
+    private Function<KoreComponentView<?>, Boolean> validation;
     @Setter(AccessLevel.PROTECTED)
     private PreferenceField preferenceKey;
+    private boolean mandatory;
     private boolean disabled;
     private String errorMessageFieldType;
     private String regexPattern = ".*";
@@ -133,15 +133,17 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         });
     }
     public boolean isValid() {
+        if (this.disabled) { return true; }
+        if (validation != null) { return validation.apply(this); }
         if (this.mandatory && StringUtils.isBlank(getText())) { return false; }
         if (this.regexPattern != null && (this.mandatory || StringUtils.isNotBlank(getText()))) { return Pattern.matches(this.regexPattern, getText()); }
         return true;
     }
-    private void executeListeners(Editable s) { if (onValueChangeAutocalcule != null) { onValueChangeAutocalcule.run(s); } }
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
         if (getDisabledOverlay() != null) { getDisabledOverlay().getRoot().setVisibility(this.disabled ? View.VISIBLE : View.GONE); }
     }
+    private void executeListeners(Editable s) { if (onValueChangeAutocalcule != null) { onValueChangeAutocalcule.run(s); } }
     @Override
     public void onClick(View v) { }
     @Override
@@ -245,7 +247,6 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         a.recycle();
     }
     protected void updatePreferences(Object value) { PreferencesHelper.getInstance().add(getPreferenceKey(), value); }
-    public void setLiveData(@NonNull MutableLiveData<Object> liveData) { this.liveData = liveData; }
     public void setMandatory(boolean mandatory) {
         this.mandatory = mandatory;
         if (getRequiredViewWarning() == null) { return; }
