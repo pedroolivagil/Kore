@@ -16,6 +16,7 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.olivadevelop.kore.R;
 import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.annotation.RegularExpressionField;
@@ -162,6 +163,12 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     public void setMinLength(int minLength) { }
     public String getText() { return null; }
     public String getHint() { return null; }
+    public void validateInput() { if (isValid()) { whenRegexIsValid(); } else { whenRegexIsNotValid(); } }
+    public void setErrorEnabled(boolean enabled) {
+        TextInputLayout t = getTextInputLayout();
+        if (t != null) { t.setErrorEnabled(enabled); }
+    }
+    protected TextInputLayout getTextInputLayout() { return null; }
     protected EditText editTextToValidate() { return null; }
     protected void whenRegexIsNotValid() { }
     protected void whenRegexIsValid() { }
@@ -170,7 +177,6 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     protected void whenAfterTextChanged(Editable e) { }
     protected void addOnClickListenerToView(View v) { v.setOnClickListener(this); }
     protected void addOnTouchListenerToView(View v) { v.setOnTouchListener(this); }
-    private void validateInput() { if (isValid()) { whenRegexIsValid(); } else { whenRegexIsNotValid(); } }
     private void processAttrs(Context context, AttributeSet attrs) {
         int defaultTextStyle = 0;
         float defaultTextSize = 16f;

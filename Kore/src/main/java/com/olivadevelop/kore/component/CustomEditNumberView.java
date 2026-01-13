@@ -10,6 +10,7 @@ import android.widget.EditText;
 
 import androidx.annotation.Nullable;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.olivadevelop.kore.R;
 import com.olivadevelop.kore.databinding.CompCustomEditTextBinding;
 import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
@@ -42,6 +43,8 @@ public class CustomEditNumberView extends KoreComponentView<CompCustomEditTextBi
     public void clearValue() { getBinding().editText.post(() -> setValue(null)); }
     @Override
     protected EditText editTextToValidate() { return getBinding().editText; }
+    @Override
+    protected TextInputLayout getTextInputLayout() { return getBinding().textInputLayout; }
     @Override
     public void setHint(String hint) { getBinding().textInputLayout.setHint(hint); }
     @Override
