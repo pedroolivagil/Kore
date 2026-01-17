@@ -111,7 +111,10 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         e.setInputType(Utils.getInputTypeFromClass(this.property));
         getProperty().forEach((property, annotations) -> {
             RegularExpressionField regex = annotations.stream()
-                    .filter(p -> p instanceof RegularExpressionField).map(a -> (RegularExpressionField) a).findFirst().orElse(null);
+                    .filter(p -> p instanceof RegularExpressionField)
+                    .map(a -> (RegularExpressionField) a)
+                    .findFirst()
+                    .orElse(null);
             post(() -> this.errorMessageFieldType = Utils.intStringFromInputType(getKoreActivity(), property, regex));
         });
     }

@@ -206,7 +206,11 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         try {
             fieldLiveData.setAccessible(true);
             MutableLiveData<Object> liveData = (MutableLiveData<Object>) fieldLiveData.get(this);
-            if (liveData != null) { if (!Objects.equals(liveData.getValue(), component.getValue())) { liveData.setValue(component.getValue()); } }
+            if (liveData != null) {
+                if (!Objects.equals(liveData.getValue(), component.getValue())) {
+                    liveData.setValue(Utils.Reflex.castToType(component.getProperty(), String.valueOf(component.getValue())).orElse(null));
+                }
+            }
         } catch (IllegalAccessException ignored) { }
     }
 }
