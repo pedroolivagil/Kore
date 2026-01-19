@@ -78,25 +78,25 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
     @Override
     public String getHint() { return getContext().getString(R.string.default_color_hint); }
     @Override
-    public Object getValue() { return this.colorSelected; }
+    public Object getValue() { return getColorSelected(); }
     @Override
     public View getRequiredViewWarning() { return getBinding().requiredWarningLabel; }
     @Override
     protected DisabledOverlayBinding getDisabledOverlay() { return getBinding().disabledView; }
     @Override
     public boolean isValid() {
-        return !isMandatory() || this.colorSelected != null;
+        return !isMandatory() || getColorSelected() != null;
     }
     @Override
     public void setValue(Object s) {
         if (s instanceof Integer) {
-            this.colorSelected = (Integer) s;
+            setColorSelected((Integer) s);
             setColorToView();
         }
     }
     @Override
     public void clearValue() {
-        this.colorSelected = null;
+        setColorSelected(null);
         setColorToView();
     }
     @Override
@@ -107,10 +107,10 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
             getBinding().btnClearImage.setVisibility(View.GONE);
             getBinding().btnResetColor.setVisibility(View.GONE);
             if (getBinding().colorPickerPreview.isHuePalette() && brightnessSlider != null) {
-                this.colorSelected = brightnessSlider.assembleColor();
+                setColorSelected(brightnessSlider.assembleColor());
                 getBinding().btnResetColor.setVisibility(View.VISIBLE);
             } else {
-                this.colorSelected = getBinding().colorPickerPreview.getPureColor();
+                setColorSelected(getBinding().colorPickerPreview.getPureColor());
                 getBinding().btnClearImage.setVisibility(View.VISIBLE);
             }
             setColorToView();
@@ -140,7 +140,7 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
         BrightnessSlideBar brightnessSlider = getBinding().colorPickerPreview.getBrightnessSlider();
         if (brightnessSlider == null) { return; }
         brightnessSlider.setSelectorPosition(1f);
-        this.colorSelected = brightnessSlider.assembleColor();
+        setColorSelected(brightnessSlider.assembleColor());
         setColorToView();
     }
     private void resetImage() {
@@ -196,7 +196,7 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
     private void openSelectorDialog() {
         new ColorPickerDialog.Builder(getContext()).setTitle("ColorPicker Dialog")
                 .setPositiveButton(getContext().getString(R.string.btn_confirm), (ColorEnvelopeListener) (envelope, fromUser) -> {
-                    this.colorSelected = envelope.getColor();
+                    setColorSelected(envelope.getColor());
                     setColorToView();
                 })
                 .setNegativeButton(getContext().getString(R.string.dialog_default_cancel), (dialogInterface, i) -> dialogInterface.dismiss())
@@ -206,8 +206,9 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
                 .show();
     }
     private void setColorToView() {
-        if (this.colorSelected == null) { this.colorSelected = Color.WHITE; }
-        getBinding().colorPreview.setBackgroundTintList(ColorStateList.valueOf(this.colorSelected));
+        if (getColorSelected() == null) { setColorSelected(Color.WHITE); }
+        getBinding().colorPreview.setBackgroundTintList(ColorStateList.valueOf(getColorSelected()));
         getBinding().colorPreviewMinimized.setBackgroundTintList(getBinding().colorPreview.getBackgroundTintList());
+        if (getOnValueChange() != null) { getOnValueChange().run(this); }
     }
 }

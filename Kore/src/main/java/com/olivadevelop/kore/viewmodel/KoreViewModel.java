@@ -59,12 +59,13 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
     private boolean hasValidation = true;
     private Map<String, KoreComponentView<?>> componentViewMap = new HashMap<>();
     private Set<InvalidPropertyErrorVM> errors = new HashSet<>();
-    //    private final Map<String, MutableLiveData<Object>> fieldLiveDataMap = new HashMap<>();
     private final Map<String, Field> fieldLiveDataMap = new HashMap<>();
     public KoreViewModel() {
         initLiveDataMap();
         buildNewData();
+        init();
     }
+    protected void init() { }
     public boolean isValid() { return false; }
     public KoreViewModel<T> buildEntityData() { return null; }
     public void reload() { buildNewData(); }
