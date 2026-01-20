@@ -22,6 +22,7 @@ public class SnackbarBuilder {
     private int duration; // 0 = Snackbar.LENGTH_LONG
 
     private CharSequence actionText;
+    private CharSequence actionSnackbarText;
     private View.OnClickListener actionListener;
 
     private Integer backgroundColor;
@@ -29,6 +30,7 @@ public class SnackbarBuilder {
     private Integer textColor;
 
     private Snackbar.Callback callback;
+    private SnackbarOnClickListener actionSnackbarListener;
 
     public static SnackbarBuilder with(View anchorView) {
         return SnackbarBuilder.builder().anchorView(anchorView).context(anchorView.getContext()).build();
@@ -65,6 +67,16 @@ public class SnackbarBuilder {
     public SnackbarBuilder action(CharSequence text, View.OnClickListener listener) {
         this.actionText = text;
         this.actionListener = listener;
+        return this;
+    }
+    public SnackbarBuilder action(@StringRes int textRes, SnackbarOnClickListener listener) {
+        this.actionSnackbarText = context.getText(textRes);
+        this.actionSnackbarListener = listener;
+        return this;
+    }
+    public SnackbarBuilder action(CharSequence text, SnackbarOnClickListener listener) {
+        this.actionSnackbarText = text;
+        this.actionSnackbarListener = listener;
         return this;
     }
     public SnackbarBuilder backgroundColor(@ColorInt int color) {
@@ -104,6 +116,7 @@ public class SnackbarBuilder {
         if (actionText != null && actionListener != null) { snackbar.setAction(actionText, actionListener); }
         if (actionTextColor != null) { snackbar.setActionTextColor(actionTextColor); }
         if (callback != null) { snackbar.addCallback(callback); }
+        if (actionSnackbarListener != null) { snackbar.setAction(actionSnackbarText, v -> actionSnackbarListener.onClick(snackbar)); }
         snackbar.show();
     }
 }
