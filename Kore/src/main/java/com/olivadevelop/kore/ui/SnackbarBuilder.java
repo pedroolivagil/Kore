@@ -9,6 +9,7 @@ import androidx.annotation.StringRes;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.olivadevelop.kore.R;
 
 import lombok.Builder;
 
@@ -31,6 +32,8 @@ public class SnackbarBuilder {
 
     private Snackbar.Callback callback;
     private SnackbarOnClickListener actionSnackbarListener;
+
+    private boolean dismissible;
 
     public static SnackbarBuilder with(View anchorView) {
         return SnackbarBuilder.builder().anchorView(anchorView).context(anchorView.getContext()).build();
@@ -107,6 +110,10 @@ public class SnackbarBuilder {
         this.callback = callback;
         return this;
     }
+    public SnackbarBuilder dismissible() {
+        this.dismissible = true;
+        return this;
+    }
     public void show() {
         if (anchorView == null || context == null) { throw new IllegalStateException("Snackbar view is required"); }
         if (message == null) { throw new IllegalStateException("Snackbar message is required"); }
@@ -117,6 +124,7 @@ public class SnackbarBuilder {
         if (actionTextColor != null) { snackbar.setActionTextColor(actionTextColor); }
         if (callback != null) { snackbar.addCallback(callback); }
         if (actionSnackbarListener != null) { snackbar.setAction(actionSnackbarText, v -> actionSnackbarListener.onClick(snackbar)); }
+        if (dismissible) { snackbar.setAction(R.string.btn_dismiss_snackbar, v -> snackbar.dismiss()); }
         snackbar.show();
     }
 }

@@ -10,7 +10,8 @@ public interface Snackbars {
         return SnackbarBuilder.with(view)
                 .backgroundColorRes(R.color.error)
                 .textColorRes(R.color.white)
-                .indefinite();
+                .indefinite()
+                .dismissible();
     }
     static SnackbarBuilder success(View view) {
         return SnackbarBuilder.with(view)
