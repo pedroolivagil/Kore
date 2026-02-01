@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.exp4j)
     implementation(libs.activity)
     implementation(libs.colorpickerview)
+    implementation(libs.recyclerview)
     implementation(libs.legacy.support.v4)
     implementation(project(":kore-annotations"))
     annotationProcessor(project(":kore-processor"))
