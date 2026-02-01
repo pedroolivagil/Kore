@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import androidx.annotation.ColorRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
@@ -153,7 +154,7 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     @Override
     public boolean onTouch(View v, MotionEvent event) { return false; }
     protected void init(Context context, @Nullable AttributeSet attrs) { }
-    protected void configureFromLayout(ComponentAttributes c) { }
+    protected void configureFromLayout(@NonNull ComponentAttributes c) { }
     protected void previewEditMode(ComponentAttributes c) { configureFromLayout(c); }
     protected DisabledOverlayBinding getDisabledOverlay() { return null; }
     public View getRequiredViewWarning() { return null; }
@@ -210,7 +211,8 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
                     .hintTextColor(ComponentAttributes.getInt(attrs, namespace, "hintTextColor", defaultTextColor))
                     .boxStrokeColor(ComponentAttributes.getInt(attrs, namespace, "borderColor", defaultBoxStrokeColor))
                     .startIconDrawable(attrs.getAttributeResourceValue(namespace, "startIconDrawable", -1))
-                    .startIconTint(ComponentAttributes.getInt(attrs, namespace, "startIconTint", -1));
+                    .startIconTint(ComponentAttributes.getInt(attrs, namespace, "startIconTint", -1))
+                    .spanCount(ComponentAttributes.getInt(attrs, namespace, "spanCount", 3));
             if (cb.valueProperties != null && cb.valueProperties.isEmpty()) {
                 String[] properties = cb.valueProperties.split(";");
                 if (cb.value.contains("%s") && properties.length > 0) {
@@ -242,7 +244,8 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
                         .boxStrokeColor(a.getColor(R.styleable.KoreComponentView_borderColor, defaultBoxStrokeColor))
                         .startIconDrawable(a.getResourceId(R.styleable.KoreComponentView_startIconDrawable, -1))
                         .startIconTint(a.getColor(R.styleable.KoreComponentView_startIconTint, -1))
-                        .hintText(a.getString(R.styleable.KoreComponentView_hintText));
+                        .hintText(a.getString(R.styleable.KoreComponentView_hintText))
+                        .spanCount(a.getInt(R.styleable.KoreComponentView_spanCount, 3));
         if (cb.valueProperties != null && !cb.valueProperties.isEmpty()) {
             String[] properties = cb.valueProperties.split(";");
             if (cb.value.contains("%s") && properties.length > 0) {
@@ -307,6 +310,7 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         private final String valueProperties;
         private final int startIconDrawable;
         private final int startIconTint;
+        private final int spanCount;
         @Builder.Default
         private final boolean mandatory = false;
         @Builder.Default

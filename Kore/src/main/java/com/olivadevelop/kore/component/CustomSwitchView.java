@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 
 import androidx.annotation.Dimension;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.olivadevelop.kore.databinding.CompCustomSwitchBinding;
@@ -35,7 +36,7 @@ public class CustomSwitchView extends KoreComponentView<CompCustomSwitchBinding>
         getBinding().toggleButton.setChecked(c.isChecked());
     }
     @Override
-    protected void configureFromLayout(ComponentAttributes c) {
+    protected void configureFromLayout(@NonNull ComponentAttributes c) {
         if (c.getTitle() != null) {
             getBinding().txtTitle.setText(c.getTitle());
             getBinding().txtTitle.setTextColor(c.getTextColor());

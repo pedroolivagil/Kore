@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 
 import androidx.annotation.Dimension;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.olivadevelop.kore.databinding.CompInfoRowBinding;
@@ -15,7 +16,7 @@ public class CustomInfoRowView extends KoreComponentView<CompInfoRowBinding> {
     @Override
     public void setValue(Object s) { if (s != null) { setValue(String.valueOf(s)); } }
     @Override
-    protected void configureFromLayout(ComponentAttributes c) {
+    protected void configureFromLayout(@NonNull ComponentAttributes c) {
         if (c.getTitle() != null) {
             getBinding().txtTitle.setText(c.getTitle());
             getBinding().txtTitle.setTextColor(c.getTextColor());

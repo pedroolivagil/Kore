@@ -3,74 +3,42 @@ package com.olivadevelop.kore.component;
 import android.content.Context;
 import android.net.Uri;
 import android.util.AttributeSet;
-import android.widget.FrameLayout;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.olivadevelop.kore.R;
 import com.olivadevelop.kore.adapter.ImageGridAdapter;
+import com.olivadevelop.kore.databinding.ViewImageGridBinding;
 
 import java.util.List;
+import java.util.function.Consumer;
 
-public class ImageGridView extends FrameLayout {
+import lombok.Getter;
 
+@Getter
+public class ImageGridView extends KoreComponentView<ViewImageGridBinding> {
     private RecyclerView recyclerView;
     private ImageGridAdapter adapter;
-
     private int spanCount = 3;
 
-    public ImageGridView(Context context) {
-        super(context);
-        init(context);
+    public ImageGridView(Context context, @Nullable AttributeSet attrs) { super(context, attrs); }
+    @Override
+    protected void configureFromLayout(@NonNull ComponentAttributes c) {
+        this.spanCount = c.getSpanCount();
     }
-
-    public ImageGridView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(context);
+    @Override
+    protected void init(Context context, @Nullable AttributeSet attrs) {
+        this.recyclerView = getBinding().recycler;
+        this.recyclerView.setLayoutManager(new GridLayoutManager(context, getSpanCount()));
+        this.adapter = new ImageGridAdapter();
+        this.recyclerView.setAdapter(adapter);
     }
-
-    public ImageGridView(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        init(context);
-    }
-
-    private void init(Context context) {
-        inflate(context, R.layout.view_image_grid, this);
-
-        recyclerView = findViewById(R.id.recycler);
-
-        recyclerView.setLayoutManager(
-                new GridLayoutManager(context, spanCount)
-        );
-
-        adapter = new ImageGridAdapter();
-        recyclerView.setAdapter(adapter);
-    }
-
-    /* ===== API PÚBLICA ===== */
-
-    public void setImages(List<Uri> images) {
-        adapter.setImages(images);
-    }
-
-    public void addImage(Uri uri) {
-        adapter.addImage(uri);
-    }
-
-    public void removeImage(Uri uri) {
-        adapter.removeImage(uri);
-    }
-
-    public List<Uri> getImages() {
-        return adapter.getImages();
-    }
-
-    public void setOnImageClickListener(ImageGridAdapter.OnImageClickListener listener) {
-        adapter.setOnImageClickListener(listener);
-    }
-
-    public void setOnAddClickListener(Runnable onAddClick) {
-        adapter.setOnAddClickListener(onAddClick);
-    }
+    public void setImages(List<Uri> images) { adapter.setImages(images); }
+    public void addImage(Uri uri) { adapter.addImage(uri); }
+    public void removeImage(Uri uri) { adapter.removeImage(uri); }
+    public List<Uri> getImages() { return adapter.getImages(); }
+    public void setOnImageClickListener(ImageGridAdapter.OnImageClickListener listener) { adapter.setOnImageClickListener(listener); }
+    public void setOnAddClickListener(Consumer<ImageGridAdapter> onAddClick) { adapter.setOnAddClickListener(onAddClick); }
 }

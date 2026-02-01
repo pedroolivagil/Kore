@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.olivadevelop.kore.databinding.ItemImageAddBinding;
 import com.olivadevelop.kore.databinding.ItemImageGridBinding;
+import com.olivadevelop.kore.media.CameraGalleryImageManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +76,8 @@ public class ImageGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             b.image.setOnClickListener(v -> { if (onImageClickListener != null) { onImageClickListener.onImageClick(images.get(getBindingAdapterPosition())); } });
         }
         void bind(Uri uri) {
-            b.image.setImageURI(uri); // o Picasso/Glide
+//            b.image.setImageURI(uri); // o Picasso/Glide
+            CameraGalleryImageManager.loadImage(uri, b.image);
         }
     }
 

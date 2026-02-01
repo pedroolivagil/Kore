@@ -41,5 +41,6 @@
         </attr>
         <attr name="startIconDrawable" format="reference" />
         <attr name="startIconTint" format="color" />
+        <attr name="spanCount" format="integer" />
     </declare-styleable>
 </resources>

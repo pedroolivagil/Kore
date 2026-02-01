@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.EditText;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -21,7 +22,7 @@ public class CustomEditTextView extends KoreComponentView<CompCustomEditTextBind
 
     public CustomEditTextView(Context context, @Nullable AttributeSet attrs) { super(context, attrs); }
     @Override
-    protected void configureFromLayout(ComponentAttributes c) {
+    protected void configureFromLayout(@NonNull ComponentAttributes c) {
         setMandatory(c.isMandatory());
         getRequiredViewWarning().setVisibility(c.isMandatory() ? View.VISIBLE : View.GONE);
         getBinding().textInputLayout.setErrorEnabled(c.isMandatory());
