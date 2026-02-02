@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="kore-android-tester">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-02-02T10:37:59.772163100Z">
+        <DropdownSelection timestamp="2026-02-02T14:48:51.491867100Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\Oliva\.android\avd\Pixel_6_Pro_API_36.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=867b30eb" />
             </handle>
           </Target>
         </DropdownSelection>
