@@ -3,7 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="8dp">
+    app:cardCornerRadius="@dimen/generic_panel_margin_half"
+    app:contentPadding="@dimen/generic_panel_margin_half"
+    app:cardBackgroundColor="@color/white">
 
     <ImageView
         android:id="@+id/image"

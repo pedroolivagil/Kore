@@ -19,21 +19,27 @@ import lombok.Getter;
 
 @Getter
 public class ImageGridView extends KoreComponentView<ViewImageGridBinding> {
-    private RecyclerView recyclerView;
-    private ImageGridAdapter adapter;
+    private final CustomImageSelector selector;
+    private final RecyclerView recyclerView;
+    private final ImageGridAdapter adapter;
     private int spanCount = 3;
 
-    public ImageGridView(Context context, @Nullable AttributeSet attrs) { super(context, attrs); }
-    @Override
-    protected void configureFromLayout(@NonNull ComponentAttributes c) {
-        this.spanCount = c.getSpanCount();
-    }
-    @Override
-    protected void init(Context context, @Nullable AttributeSet attrs) {
+    public ImageGridView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
         this.recyclerView = getBinding().recycler;
+        this.selector = getBinding().selector;
         this.recyclerView.setLayoutManager(new GridLayoutManager(context, getSpanCount()));
         this.adapter = new ImageGridAdapter();
         this.recyclerView.setAdapter(adapter);
+        OnValueChange ovc = getBinding().selector.getOnValueChange();
+        getBinding().selector.setOnValueChange(s -> {
+            if (ovc != null) { ovc.run(s); }
+            if (getBinding().selector.getPhotoUri() != null) { adapter.addImage(getBinding().selector.getPhotoUri()); }
+        });
+    }
+    @Override
+    protected void configureFromLayout(@NonNull ComponentAttributes c) {
+        this.spanCount = c.getSpanCount();
     }
     public void setImages(List<Uri> images) { adapter.setImages(images); }
     public void addImage(Uri uri) { adapter.addImage(uri); }

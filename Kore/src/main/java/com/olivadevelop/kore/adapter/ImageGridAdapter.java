@@ -37,14 +37,11 @@ public class ImageGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        if (viewType == TYPE_IMAGE) {
-            return new ImageViewHolder(ItemImageGridBinding.inflate(inflater, parent, false));
-        } else {
-            return new AddViewHolder(ItemImageAddBinding.inflate(inflater, parent, false));
-        }
+        return new ImageViewHolder(ItemImageGridBinding.inflate(inflater, parent, false));
     }
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        if (images.isEmpty()) { return; }
         if (holder instanceof ImageViewHolder) {
             Uri uri = images.get(position);
             ((ImageViewHolder) holder).bind(uri);
@@ -73,14 +70,12 @@ public class ImageGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         ImageViewHolder(ItemImageGridBinding binding) {
             super(binding.getRoot());
             this.b = binding;
-            b.image.setOnClickListener(v -> { if (onImageClickListener != null) { onImageClickListener.onImageClick(images.get(getBindingAdapterPosition())); } });
+            b.image.setOnClickListener(v -> {
+                if (onImageClickListener != null) { onImageClickListener.onImageClick(images.get(getBindingAdapterPosition())); }
+            });
         }
-        void bind(Uri uri) {
-//            b.image.setImageURI(uri); // o Picasso/Glide
-            CameraGalleryImageManager.loadImage(uri, b.image);
-        }
+        void bind(Uri uri) { CameraGalleryImageManager.loadImage(uri, b.image); }
     }
-
     @Getter
     class AddViewHolder extends RecyclerView.ViewHolder {
         private final ItemImageAddBinding b;
@@ -90,7 +85,6 @@ public class ImageGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             binding.getRoot().setOnClickListener(v -> { if (onAddClickListener != null) { onAddClickListener.accept(ImageGridAdapter.this); } });
         }
     }
-
     public interface OnImageClickListener {
         void onImageClick(Uri uri);
     }
