@@ -1,0 +1,8 @@
+<paths>
+    <external-files-path
+        name="kore"
+        path="kore/" />
+    <external-files-path
+        name="tmp"
+        path="tmp/" />
+</paths>

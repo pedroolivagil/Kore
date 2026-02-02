@@ -14,12 +14,13 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.InsetDrawable;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.MediaStore;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.activity.result.PickVisualMediaRequest;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.core.content.FileProvider;
 
 import com.olivadevelop.kore.Constants;
@@ -37,7 +38,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import lombok.Builder;
 import lombok.Data;
@@ -61,15 +64,44 @@ public interface CameraGalleryImageManager {
     static void loadImage(Uri uri, ImageView view, Callback callback) {
         Picasso.get().load(uri).placeholder(R.drawable.ic_img).error(R.drawable.ic_error).fit().centerCrop().into(view, callback);
     }
-    static void openGallery(KoreActivity<?, ?> activity) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && !activity.getPermissionManager().areGranted(activity.getReadStoragePermission())) {
-            activity.getPermissionManager().requestPermissions(activity.getReadStoragePermission());
-            return;
+    static void openGallery(KoreActivity<?, ?> activity, int maxImages, Consumer<List<Uri>> result) {
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S && !activity.getPermissionManager().areGranted(activity.getReadStoragePermission())) {
+//            activity.getPermissionManager().requestPermissions(activity.getReadStoragePermission());
+//            return;
+//        }
+//        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+//        photoPickerIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+//        photoPickerIntent.setType(Constants.IntentParam.INTENT_IMAGE_TYPE);
+//        startActivityForResult(activity, photoPickerIntent, REQUEST_CODE_GALLERY, null);
+        ///////////////////////
+//        ActivityResultLauncher<PickVisualMediaRequest> pickImagesLauncher = getPickVisualMediaRequestActivityResultLauncher(activity, maxImages, result);
+        IPickerVisualMediaResult picker;
+        if (maxImages > 1) {
+            picker = activity.getPickMultiplesImagesLauncher();
+        } else {
+            picker = activity.getPickImagesLauncher();
         }
-        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-        photoPickerIntent.setType(Constants.IntentParam.INTENT_IMAGE_TYPE);
-        startActivityForResult(activity, photoPickerIntent, REQUEST_CODE_GALLERY, null);
+        picker.setResult(result);
+        picker.setMaxImages(maxImages);
+        picker.getPickImagesLauncher().launch(
+                new PickVisualMediaRequest.Builder()
+                        .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
+                        .build()
+        );
     }
+    //    @NonNull
+//    private static ActivityResultLauncher<PickVisualMediaRequest> getPickVisualMediaRequestActivityResultLauncher(KoreActivity<?, ?> activity, int maxImages,
+//            Consumer<List<Uri>> result) {
+//        ActivityResultLauncher<PickVisualMediaRequest> pickImagesLauncher;
+//        if (maxImages > 1) {
+//            pickImagesLauncher = activity.registerForActivityResult(new ActivityResultContracts.PickMultipleVisualMedia(maxImages),
+//                    uris -> result.accept(uris.stream().filter(Objects::nonNull).collect(Collectors.toList()))
+//            );
+//        } else {
+//            pickImagesLauncher = activity.registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> result.accept(List.of(uri)));
+//        }
+//        return pickImagesLauncher;
+//    }
     static Uri openCamera(KoreActivity<?, ?> activity, View btn, String imageName) {
         Uri photoUri = null;
         if (!activity.getPermissionManager().areGranted(activity.getCameraPermission())) {

@@ -212,7 +212,8 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
                     .boxStrokeColor(ComponentAttributes.getInt(attrs, namespace, "borderColor", defaultBoxStrokeColor))
                     .startIconDrawable(attrs.getAttributeResourceValue(namespace, "startIconDrawable", -1))
                     .startIconTint(ComponentAttributes.getInt(attrs, namespace, "startIconTint", -1))
-                    .spanCount(ComponentAttributes.getInt(attrs, namespace, "spanCount", 3));
+                    .spanCount(ComponentAttributes.getInt(attrs, namespace, "spanCount", 3))
+                    .maxImages(ComponentAttributes.getInt(attrs, namespace, "maxImages", 1));
             if (cb.valueProperties != null && cb.valueProperties.isEmpty()) {
                 String[] properties = cb.valueProperties.split(";");
                 if (cb.value.contains("%s") && properties.length > 0) {
@@ -245,7 +246,8 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
                         .startIconDrawable(a.getResourceId(R.styleable.KoreComponentView_startIconDrawable, -1))
                         .startIconTint(a.getColor(R.styleable.KoreComponentView_startIconTint, -1))
                         .hintText(a.getString(R.styleable.KoreComponentView_hintText))
-                        .spanCount(a.getInt(R.styleable.KoreComponentView_spanCount, 3));
+                        .spanCount(a.getInt(R.styleable.KoreComponentView_spanCount, 3))
+                        .maxImages(a.getInt(R.styleable.KoreComponentView_maxImages, 1));
         if (cb.valueProperties != null && !cb.valueProperties.isEmpty()) {
             String[] properties = cb.valueProperties.split(";");
             if (cb.value.contains("%s") && properties.length > 0) {
@@ -311,6 +313,7 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         private final int startIconDrawable;
         private final int startIconTint;
         private final int spanCount;
+        private final int maxImages;
         @Builder.Default
         private final boolean mandatory = false;
         @Builder.Default

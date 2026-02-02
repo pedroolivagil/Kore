@@ -36,6 +36,8 @@ import com.olivadevelop.kore.R;
 import com.olivadevelop.kore.databinding.LoaderWrapperBinding;
 import com.olivadevelop.kore.error.FormErrorException;
 import com.olivadevelop.kore.media.CameraPermissionProvider;
+import com.olivadevelop.kore.media.MultiplePickerVisualMediaResult;
+import com.olivadevelop.kore.media.OnePickerVisualMediaResult;
 import com.olivadevelop.kore.nav.Navigation;
 import com.olivadevelop.kore.security.PermissionContract;
 import com.olivadevelop.kore.security.PermissionManager;
@@ -85,6 +87,9 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
     private final Set<AdView> adViews = new HashSet<>();
     @Setter(AccessLevel.PROTECTED)
     private NavigationBarView navigationView;
+
+    private OnePickerVisualMediaResult pickImagesLauncher;
+    private MultiplePickerVisualMediaResult pickMultiplesImagesLauncher;
     @NonNull
     @Override
     public PermissionContract getCameraPermission() { throw new UnsupportedOperationException("CameraPermission not implemented in Activity"); }
@@ -106,6 +111,10 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
             setSystemBarsInsets(v, insets);
             return insets;
         });
+
+        pickMultiplesImagesLauncher = new MultiplePickerVisualMediaResult(this);
+        pickImagesLauncher = new OnePickerVisualMediaResult(this);
+
         init(savedInstanceState);
         binding.getRoot().post(() -> initPost(savedInstanceState));
         getExtras().stream().filter(e -> e.keySet().contains(Constants.Field.SCREEN_BACK)).findFirst().ifPresent(e -> {

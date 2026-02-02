@@ -3,12 +3,12 @@ package com.olivadevelop.kore.component;
 import static android.app.Activity.RESULT_OK;
 
 import android.content.Context;
-import android.content.Intent;
 import android.net.Uri;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.olivadevelop.kore.Constants;
@@ -20,10 +20,13 @@ import com.olivadevelop.kore.media.CameraGalleryImageManager;
 import java.io.FileNotFoundException;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class CustomImageSelector extends KoreComponentView<CompCustomImageSelectorBinding> {
     private Uri photoUri;
+    @Setter
+    private int maxImages;
 
     public CustomImageSelector(Context context, @Nullable AttributeSet attrs) { super(context, attrs); }
 
@@ -32,13 +35,13 @@ public class CustomImageSelector extends KoreComponentView<CompCustomImageSelect
         addOnClickListenerToView(getBinding().btnPreviewGallery);
         addOnClickListenerToView(getBinding().btnPreviewCamera);
         getBinding().getRoot().post(() -> getKoreActivity().setListener((requestCode, resultCode, data) -> {
-            if (CameraGalleryImageManager.REQUEST_CODE_GALLERY == requestCode) {
-                processIntentMediaGallery(data);
-            } else if (CameraGalleryImageManager.REQUEST_IMAGE_CAPTURE == requestCode && RESULT_OK == resultCode) {
+            if (CameraGalleryImageManager.REQUEST_IMAGE_CAPTURE == requestCode && RESULT_OK == resultCode) {
                 processIntentMediaCamera();
             }
         }));
     }
+    @Override
+    protected void configureFromLayout(@NonNull ComponentAttributes c) { this.maxImages = c.getMaxImages(); }
     @Override
     public Object getValue() { return photoUri != null ? photoUri.getPath() : null; }
     @Override
@@ -58,16 +61,14 @@ public class CustomImageSelector extends KoreComponentView<CompCustomImageSelect
         if (v == getBinding().btnPreviewCamera) {
             this.photoUri = CameraGalleryImageManager.openCamera(getKoreActivity(), v, Constants.Files.DIR_TMP_PREVIEW);
         } else if (v == getBinding().btnPreviewGallery) {
-            CameraGalleryImageManager.openGallery(getKoreActivity());
-        }
-    }
-    private void processIntentMediaGallery(Intent data) {
-        if (data == null || data.getData() == null) { return; }
-        try {
-            this.photoUri = data.getData();
-            processMediaImage(data.getData());
-        } catch (FileNotFoundException e) {
-            Log.e(Constants.Log.TAG, "Error on select image from preview color. TRACE: " + e.getMessage());
+            CameraGalleryImageManager.openGallery(getKoreActivity(), this.maxImages, result -> result.forEach(uri -> {
+                try {
+                    this.photoUri = uri;
+                    processMediaImage(uri);
+                } catch (FileNotFoundException e) {
+                    Log.e(Constants.Log.TAG, "Error on select image from preview color. TRACE: " + e.getMessage());
+                }
+            }));
         }
     }
     private void processIntentMediaCamera() {

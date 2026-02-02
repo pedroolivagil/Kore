@@ -23,11 +23,13 @@ public class ImageGridView extends KoreComponentView<ViewImageGridBinding> {
     private final RecyclerView recyclerView;
     private final ImageGridAdapter adapter;
     private int spanCount;
+    private int maxImages;
 
     public ImageGridView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.recyclerView = getBinding().recycler;
         this.selector = getBinding().selector;
+        this.selector.setMaxImages(this.maxImages);
         this.recyclerView.setLayoutManager(new GridLayoutManager(context, getSpanCount()));
         this.adapter = new ImageGridAdapter();
         this.recyclerView.setAdapter(adapter);
@@ -38,7 +40,10 @@ public class ImageGridView extends KoreComponentView<ViewImageGridBinding> {
         });
     }
     @Override
-    protected void configureFromLayout(@NonNull ComponentAttributes c) { this.spanCount = c.getSpanCount(); }
+    protected void configureFromLayout(@NonNull ComponentAttributes c) {
+        this.spanCount = c.getSpanCount();
+        this.maxImages = c.getMaxImages();
+    }
     public void setImages(List<Uri> images) { adapter.setImages(images); }
     public void addImage(Uri uri) { adapter.addImage(uri); }
     public void removeImage(Uri uri) { adapter.removeImage(uri); }

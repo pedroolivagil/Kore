@@ -4,7 +4,6 @@ import static android.app.Activity.RESULT_OK;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -41,6 +40,7 @@ import lombok.Setter;
 public class CustomColorPickerView extends KoreComponentView<CompCustomColorSelectorBinding> {
     private Uri photoUri;
     private Integer colorSelected;
+    private final Integer maxImages = 1;
     private static final Bitmap bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888);
 
     public CustomColorPickerView(Context context, @Nullable AttributeSet attrs) { super(context, attrs); }
@@ -58,9 +58,7 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
         addOnTouchListenerToView(getBinding().brightnessSlide);
         if (getKoreActivity() != null) {
             getBinding().colorPickerPreview.post(() -> getKoreActivity().setListener((requestCode, resultCode, data) -> {
-                if (CameraGalleryImageManager.REQUEST_CODE_GALLERY == requestCode) {
-                    processIntentMediaGallery(context, data);
-                } else if (CameraGalleryImageManager.REQUEST_IMAGE_CAPTURE == requestCode && RESULT_OK == resultCode) {
+                if (CameraGalleryImageManager.REQUEST_IMAGE_CAPTURE == requestCode && RESULT_OK == resultCode) {
                     processIntentMediaCamera(context);
                 }
             }));
@@ -122,7 +120,13 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
     @Override
     public void onClick(View v) {
         if (v == getBinding().btnPreviewGallery) {
-            CameraGalleryImageManager.openGallery(getKoreActivity());
+            CameraGalleryImageManager.openGallery(getKoreActivity(), this.maxImages, result -> result.forEach(uri -> {
+                try {
+                    processMediaImage(getContext(), uri);
+                } catch (FileNotFoundException e) {
+                    Log.e(Constants.Log.TAG, "Error on select image from preview color. TRACE: " + e.getMessage());
+                }
+            }));
         } else if (v == getBinding().btnPreviewCamera) {
             this.photoUri = CameraGalleryImageManager.openCamera(getKoreActivity(), v, Constants.Files.DIR_TMP_PREVIEW);
         } else if (v == getBinding().btnClearImage) {
@@ -149,14 +153,6 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
         getBinding().brightnessSlide.setVisibility(View.VISIBLE);
         getBinding().colorPickerPreview.setPaletteDrawable(getColorHsvPalette());
         resetColor();
-    }
-    private void processIntentMediaGallery(Context context, Intent data) {
-        if (data == null || data.getData() == null) { return; }
-        try {
-            processMediaImage(context, data.getData());
-        } catch (FileNotFoundException e) {
-            Log.e(Constants.Log.TAG, "Error on select image from preview color. TRACE: " + e.getMessage());
-        }
     }
     private void processIntentMediaCamera(Context context) {
         try {
