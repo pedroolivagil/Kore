@@ -1,7 +1,9 @@
 package com.olivadevelop.kore.adapter;
 
+import android.content.Context;
 import android.net.Uri;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
@@ -37,7 +39,12 @@ public class ImageGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater inflater = LayoutInflater.from(parent.getContext());
-        return new ImageViewHolder(ItemImageGridBinding.inflate(inflater, parent, false));
+        if(TYPE_IMAGE == viewType) {
+            return new ImageViewHolder(ItemImageGridBinding.inflate(inflater, parent, false));
+        }else {
+//            return new AddViewHolder(ItemImageAddBinding.inflate(inflater, parent, false));
+            return new EmptyViewHolder(parent.getContext());
+        }
     }
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
@@ -83,6 +90,12 @@ public class ImageGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             super(binding.getRoot());
             this.b = binding;
             binding.getRoot().setOnClickListener(v -> { if (onAddClickListener != null) { onAddClickListener.accept(ImageGridAdapter.this); } });
+        }
+    }
+    @Getter
+    class EmptyViewHolder extends RecyclerView.ViewHolder {
+        EmptyViewHolder(Context ctx) {
+            super(new View(ctx));
         }
     }
     public interface OnImageClickListener {

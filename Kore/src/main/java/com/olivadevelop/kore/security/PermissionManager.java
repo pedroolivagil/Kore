@@ -27,6 +27,7 @@ public class PermissionManager<T extends PermissionContract> {
     //    @SafeVarargs
     public final boolean areGranted(PermissionContract... permissions) {
         for (PermissionContract p : permissions) {
+            if (p == null) { throw new UnsupportedOperationException("The NULL permission is not valid to be granted"); }
             if (ContextCompat.checkSelfPermission(activity, p.getValue()) != PackageManager.PERMISSION_GRANTED) { return false; }
         }
         return true;

@@ -27,6 +27,7 @@
     <string name="dialog_default_action">Action</string>
     <string name="needs_correction_fields">Some information needs a minor correction before we continue</string>
     <string name="the_camera_has_not_been_detected">The camera has not been detected.</string>
+    <string name="file_provider_not_defined">The "file_paths.xml" file has not been defined</string>
     <string name="error_input_type_number">Only numbers and a maximum of %d characters.</string>
     <string name="error_input_type_string_simple">Only letters, numbers and a maximum of %d characters.</string>
     <string name="error_input_type_string_full">Any value and a maximum of %d characters.</string>

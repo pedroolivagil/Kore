@@ -81,10 +81,12 @@ public interface CameraGalleryImageManager {
             File photoFile = createImageFile(activity, imageName);
             photoUri = FileProvider.getUriForFile(activity, Constants.Provider.CAMERA_PROVIDER, photoFile);
             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+            startActivityForResult(activity, takePictureIntent, REQUEST_IMAGE_CAPTURE, null);
         } catch (IOException e) {
             SnackbarBuilder.with(btn).message(activity.getString(R.string.the_camera_has_not_been_detected)).show();
+        } catch (IllegalArgumentException e) {
+            throw new UnsupportedOperationException("The 'file_paths.xml' file has not been defined");
         }
-        startActivityForResult(activity, takePictureIntent, REQUEST_IMAGE_CAPTURE, null);
         return photoUri;
     }
     static File createImageFile(KoreActivity<?, ?> activity, String url) throws IOException {

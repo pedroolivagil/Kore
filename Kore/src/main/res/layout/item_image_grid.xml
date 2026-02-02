@@ -10,7 +10,7 @@
     <ImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:contentDescription="TODO"
+        android:layout_height="80dp"
+        android:contentDescription="@string/default_image_hint"
         android:scaleType="centerCrop" />
 </com.google.android.material.card.MaterialCardView>

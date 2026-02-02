@@ -13,6 +13,7 @@ import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -84,7 +85,12 @@ public abstract class KoreActivity<T extends ViewBinding, V extends KoreViewMode
     private final Set<AdView> adViews = new HashSet<>();
     @Setter(AccessLevel.PROTECTED)
     private NavigationBarView navigationView;
-
+    @NonNull
+    @Override
+    public PermissionContract getCameraPermission() { throw new UnsupportedOperationException("CameraPermission not implemented in Activity"); }
+    @NonNull
+    @Override
+    public PermissionContract getReadStoragePermission() { throw new UnsupportedOperationException("ReadStoragePermission not implemented in Activity"); }
     @Override
     protected final void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

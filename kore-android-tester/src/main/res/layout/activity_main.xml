@@ -43,6 +43,7 @@
 
         <com.olivadevelop.kore.component.ImageGridView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            app:spanCount="5"/>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
