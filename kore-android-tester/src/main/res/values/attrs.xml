@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="KoreComponentView">
+        <attr name="mandatory" format="boolean" />
+        <attr name="checked" format="boolean" />
+        <attr name="enabled" format="boolean" />
+        <attr name="errorEnabled" format="boolean" />
+        <attr name="preferenceKey" format="string" />
+        <attr name="preferenceType" format="enum">
+            <enum name="type_boolean" value="0" />
+            <enum name="type_float" value="1" />
+            <enum name="type_integer" value="2" />
+            <enum name="type_long" value="3" />
+            <enum name="type_string" value="4" />
+            <enum name="type_stringSet" value="5" />
+            <enum name="type_object" value="6" />
+        </attr>
+        <attr name="hintText" format="string" />
+        <attr name="subtitle" format="string" />
+        <attr name="borderColor" format="color" />
+        <attr name="boxStrokeColor" format="color" />
+        <attr name="textColor" format="color" />
+        <attr name="hintTextColor" format="color" />
+        <attr name="textSize" format="dimension" />
+        <attr name="textStyle" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="bold" value="1" />
+            <enum name="italic" value="2" />
+            <enum name="bold_italic" value="3" />
+        </attr>
+        <attr name="title" format="string" />
+        <attr name="value" format="string" />
+        <attr name="valueProperties" format="string" />
+        <attr name="valueTextColor" format="color" />
+        <attr name="valueTextSize" format="dimension" />
+        <attr name="valueTextStyle" format="enum">
+            <enum name="normal" value="0" />
+            <enum name="bold" value="1" />
+            <enum name="italic" value="2" />
+            <enum name="bold_italic" value="3" />
+        </attr>
+        <attr name="startIconDrawable" format="reference" />
+        <attr name="startIconTint" format="color" />
+        <attr name="spanCount" format="integer" />
+        <attr name="maxImages" format="integer" />
+    </declare-styleable>
+</resources>

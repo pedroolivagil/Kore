@@ -43,6 +43,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
+    compileOnly(libs.lombok)
+    annotationProcessor(libs.lombok)
     implementation(project(":Kore"))
     implementation(project(":kore-annotations"))
     annotationProcessor(project(":kore-processor"))

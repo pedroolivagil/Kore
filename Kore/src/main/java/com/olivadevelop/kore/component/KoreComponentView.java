@@ -25,6 +25,7 @@ import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
 import com.olivadevelop.kore.preferences.PreferenceField;
 import com.olivadevelop.kore.preferences.PreferencesHelper;
 import com.olivadevelop.kore.util.AutoCalculateFormulaData;
+import com.olivadevelop.kore.component.attribute.KoreAttributes;
 import com.olivadevelop.kore.util.Utils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -81,6 +82,8 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     private Map<Class<?>, List<? extends Annotation>> property;
     private final T binding;
     private final DisabledOverlayBinding disabledOverlayBinding;
+
+    private final KoreAttributes attributes = new KoreAttributes();
 
     public KoreComponentView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
