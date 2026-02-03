@@ -155,7 +155,7 @@ public class GenerateXMLAttributesProcessor extends AbstractProcessor {
                     .append("),").append(Params.LINE_BREAK);
         }
         sb.append("    ;").append(Params.LINE_BREAK_DOUBLE);
-        sb.append("    public final int value;").append(Params.LINE_BREAK);
+        sb.append("    private final int value;").append(Params.LINE_BREAK);
         sb.append("    ").append(enumName).append("(int value) {").append(Params.LINE_BREAK);
         sb.append("        this.value = value;").append(Params.LINE_BREAK);
         sb.append("    }").append(Params.LINE_BREAK);
@@ -191,8 +191,8 @@ public class GenerateXMLAttributesProcessor extends AbstractProcessor {
                     .append("),").append(Params.LINE_BREAK);
         }
         sb.append(";").append(Params.LINE_BREAK_DOUBLE);
-        sb.append("    public final String xmlName;").append(Params.LINE_BREAK);
-        sb.append("    public final KoreAttributeFormat type;").append(Params.LINE_BREAK);
+        sb.append("    private final String xmlName;").append(Params.LINE_BREAK);
+        sb.append("    private final KoreAttributeFormat type;").append(Params.LINE_BREAK);
         sb.append("    ").append(className)
                 .append("(String xmlName, KoreAttributeFormat type) {").append(Params.LINE_BREAK)
                 .append("        this.xmlName = xmlName;").append(Params.LINE_BREAK)

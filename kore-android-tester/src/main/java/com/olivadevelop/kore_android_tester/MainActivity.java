@@ -22,6 +22,6 @@ public class MainActivity extends KoreActivity<ActivityMainBinding, MainActivity
     @Override
     protected void init(Bundle savedInstanceState) {
         super.init(savedInstanceState);
-        KoreComponentViewAttribute.MANDATORY.getXmlName();
+//        KoreComponentViewAttribute.MANDATORY.getXmlName();
     }
 }
