@@ -1,4 +1,4 @@
-package com.olivadevelop.kore_processor.component.attribute;
+package com.olivadevelop.kore_processor.attributes;
 
 public enum AttributeFormat {
     BOOLEAN("boolean"),

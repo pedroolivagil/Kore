@@ -1,11 +1,13 @@
-package com.olivadevelop.kore_processor.attributes;
+package com.olivadevelop.kore_processor;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
 import com.google.auto.service.AutoService;
-import com.olivadevelop.kore_processor.component.attribute.AttributeFormat;
+import com.olivadevelop.kore_processor.attributes.XmlAttrModel;
+import com.olivadevelop.kore_processor.attributes.XmlEnumModel;
+import com.olivadevelop.kore_processor.attributes.XmlEnumValue;
+import com.olivadevelop.kore_processor.attributes.AttributeFormat;
 import com.olivadevelop.kore_annotations.GenerateXMLAttributes;
-import com.olivadevelop.kore_processor.Params;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

@@ -1,7 +1,5 @@
 package com.olivadevelop.kore_processor.attributes;
 
-import com.olivadevelop.kore_processor.component.attribute.AttributeFormat;
-
 import java.util.Objects;
 import java.util.Set;
 
