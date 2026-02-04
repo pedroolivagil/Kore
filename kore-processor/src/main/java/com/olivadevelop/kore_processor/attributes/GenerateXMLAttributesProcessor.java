@@ -3,7 +3,7 @@ package com.olivadevelop.kore_processor.attributes;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
 import com.google.auto.service.AutoService;
-import com.olivadevelop.kore.component.attribute.KoreAttributeFormat;
+import com.olivadevelop.kore_processor.component.attribute.AttributeFormat;
 import com.olivadevelop.kore_annotations.GenerateXMLAttributes;
 import com.olivadevelop.kore_processor.Params;
 
@@ -98,16 +98,16 @@ public class GenerateXMLAttributesProcessor extends AbstractProcessor {
             XmlAttrModel model = new XmlAttrModel();
             model.setName(attr.getAttribute("name"));
             model.setFormats(parseFormats(attr));
-            if (model.getFormats().contains(KoreAttributeFormat.ENUM)) { model.setEnumModel(parseEnum(attr, model.getName())); }
+            if (model.getFormats().contains(AttributeFormat.ENUM)) { model.setEnumModel(parseEnum(attr, model.getName())); }
             attrs.add(model);
         }
         return attrs;
     }
-    private Set<KoreAttributeFormat> parseFormats(Element attr) {
-        Set<KoreAttributeFormat> formats = new HashSet<>();
+    private Set<AttributeFormat> parseFormats(Element attr) {
+        Set<AttributeFormat> formats = new HashSet<>();
         String format = attr.getAttribute("format");
         if (format.isEmpty()) { return formats; }
-        for (String f : format.split("\\|")) { formats.add(KoreAttributeFormat.fromXml(f.trim())); }
+        for (String f : format.split("\\|")) { formats.add(AttributeFormat.fromXml(f.trim())); }
         return formats;
     }
     private XmlEnumModel parseEnum(Element attr, String attrName) {
@@ -117,10 +117,7 @@ public class GenerateXMLAttributesProcessor extends AbstractProcessor {
         NodeList enums = attr.getElementsByTagName("enum");
         for (int i = 0; i < enums.getLength(); i++) {
             Element e = (Element) enums.item(i);
-            model.getValues().add(new XmlEnumValue(
-                    e.getAttribute("name"),
-                    Integer.parseInt(e.getAttribute("value"))
-            ));
+            model.getValues().add(new XmlEnumValue(                    e.getAttribute("name"),                    Integer.parseInt(e.getAttribute("value"))            ));
         }
         return model;
     }

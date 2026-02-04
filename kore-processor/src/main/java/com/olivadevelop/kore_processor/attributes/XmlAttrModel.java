@@ -1,23 +1,23 @@
 package com.olivadevelop.kore_processor.attributes;
 
-import com.olivadevelop.kore.component.attribute.KoreAttributeFormat;
+import com.olivadevelop.kore_processor.component.attribute.AttributeFormat;
 
 import java.util.Objects;
 import java.util.Set;
 
 public class XmlAttrModel {
     private String name;               // mandatory
-    private Set<KoreAttributeFormat> formats;   // boolean, enum, string...
+    private Set<AttributeFormat> formats;   // boolean, enum, string...
     private XmlEnumModel enumModel;    // null si no es enum
-    public KoreAttributeFormat primaryType() {
-        if (formats.contains(KoreAttributeFormat.ENUM)) { return KoreAttributeFormat.ENUM; }
-        if (formats.contains(KoreAttributeFormat.STRING)) { return KoreAttributeFormat.STRING; }
-        if (formats.contains(KoreAttributeFormat.BOOLEAN)) { return KoreAttributeFormat.BOOLEAN; }
-        if (formats.contains(KoreAttributeFormat.INTEGER)) { return KoreAttributeFormat.INTEGER; }
-        if (formats.contains(KoreAttributeFormat.FLOAT)) { return KoreAttributeFormat.FLOAT; }
-        if (formats.contains(KoreAttributeFormat.DIMENSION)) { return KoreAttributeFormat.DIMENSION; }
-        if (formats.contains(KoreAttributeFormat.COLOR)) { return KoreAttributeFormat.COLOR; }
-        if (formats.contains(KoreAttributeFormat.REFERENCE)) { return KoreAttributeFormat.REFERENCE; }
+    public AttributeFormat primaryType() {
+        if (formats.contains(AttributeFormat.ENUM)) { return AttributeFormat.ENUM; }
+        if (formats.contains(AttributeFormat.STRING)) { return AttributeFormat.STRING; }
+        if (formats.contains(AttributeFormat.BOOLEAN)) { return AttributeFormat.BOOLEAN; }
+        if (formats.contains(AttributeFormat.INTEGER)) { return AttributeFormat.INTEGER; }
+        if (formats.contains(AttributeFormat.FLOAT)) { return AttributeFormat.FLOAT; }
+        if (formats.contains(AttributeFormat.DIMENSION)) { return AttributeFormat.DIMENSION; }
+        if (formats.contains(AttributeFormat.COLOR)) { return AttributeFormat.COLOR; }
+        if (formats.contains(AttributeFormat.REFERENCE)) { return AttributeFormat.REFERENCE; }
         throw new IllegalStateException("No primary type for attr: " + name);
     }
     public String getName() {
@@ -26,10 +26,10 @@ public class XmlAttrModel {
     public void setName(String name) {
         this.name = name;
     }
-    public Set<KoreAttributeFormat> getFormats() {
+    public Set<AttributeFormat> getFormats() {
         return formats;
     }
-    public void setFormats(Set<KoreAttributeFormat> formats) {
+    public void setFormats(Set<AttributeFormat> formats) {
         this.formats = formats;
     }
     public XmlEnumModel getEnumModel() {
