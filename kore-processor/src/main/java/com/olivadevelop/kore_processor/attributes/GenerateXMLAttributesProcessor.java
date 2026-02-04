@@ -1,13 +1,11 @@
-package com.olivadevelop.kore_processor;
+package com.olivadevelop.kore_processor.attributes;
 
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
 import com.google.auto.service.AutoService;
 import com.olivadevelop.kore.component.attribute.KoreAttributeFormat;
 import com.olivadevelop.kore_annotations.GenerateXMLAttributes;
-import com.olivadevelop.kore_processor.attributes.XmlAttrModel;
-import com.olivadevelop.kore_processor.attributes.XmlEnumModel;
-import com.olivadevelop.kore_processor.attributes.XmlEnumValue;
+import com.olivadevelop.kore_processor.Params;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -165,10 +163,9 @@ public class GenerateXMLAttributesProcessor extends AbstractProcessor {
         String className = cfg.prefix() + cfg.styleable() + "Attribute";
         StringBuilder sb = new StringBuilder();
         sb.append("package ").append(cfg.targetPackage()).append(Params.SEMICOLON).append(Params.LINE_BREAK_DOUBLE);
-        sb.append("import static ").append(com.olivadevelop.kore.component.attribute.KoreAttributeFormat.class.getCanonicalName())
-                .append(".*").append(Params.SEMICOLON).append(Params.LINE_BREAK_DOUBLE);
+        sb.append("import static com.olivadevelop.kore.component.attribute.KoreAttributeFormat.*").append(Params.SEMICOLON).append(Params.LINE_BREAK_DOUBLE);
         Set<String> imports = new HashSet<>();
-        imports.add(com.olivadevelop.kore.component.attribute.KoreAttributeFormat.class.getCanonicalName());
+        imports.add("com.olivadevelop.kore.component.attribute.KoreAttributeFormat");
         imports.add(lombok.Getter.class.getCanonicalName());
         imports.add(javax.annotation.processing.Generated.class.getCanonicalName());
         imports.stream().sorted().forEach(i -> sb.append("import ").append(i).append(Params.SEMICOLON).append(Params.LINE_BREAK));
@@ -193,10 +190,10 @@ public class GenerateXMLAttributesProcessor extends AbstractProcessor {
         }
         sb.append(";").append(Params.LINE_BREAK_DOUBLE);
         sb.append("    private final String xmlName").append(Params.SEMICOLON).append(Params.LINE_BREAK);
-        sb.append("    private final ").append(KoreAttributeFormat.class.getSimpleName()).append(" type").append(Params.SEMICOLON).append(Params.LINE_BREAK);
+        sb.append("    private final KoreAttributeFormat type").append(Params.SEMICOLON).append(Params.LINE_BREAK);
         sb.append("    private final String styleableName").append(Params.SEMICOLON).append(Params.LINE_BREAK);
         sb.append("    ").append(className)
-                .append("(String xmlName, ").append(KoreAttributeFormat.class.getSimpleName()).append(" type, String styleableName) {").append(Params.LINE_BREAK)
+                .append("(String xmlName, KoreAttributeFormat type, String styleableName) {").append(Params.LINE_BREAK)
                 .append("        this.xmlName = xmlName").append(Params.SEMICOLON).append(Params.LINE_BREAK)
                 .append("        this.type = type").append(Params.SEMICOLON).append(Params.LINE_BREAK)
                 .append("        this.styleableName = styleableName").append(Params.SEMICOLON).append(Params.LINE_BREAK)
