@@ -11,5 +11,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface CustomViewRender {
     Class<? extends KoreComponentView<?>> value();
-    Class<?> converTo();
+    Class<?> convertTo();
+    RegularExpressionOption[] options() default {};
 }

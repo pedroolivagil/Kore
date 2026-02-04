@@ -13,9 +13,11 @@ import androidx.lifecycle.ViewModel;
 import com.olivadevelop.kore.Constants;
 import com.olivadevelop.kore.KoreViewModelStatic;
 import com.olivadevelop.kore.activity.KoreActivity;
+import com.olivadevelop.kore.annotation.CustomViewRender;
 import com.olivadevelop.kore.annotation.OrderProperty;
 import com.olivadevelop.kore.annotation.OrderPropertyOnView;
 import com.olivadevelop.kore.annotation.RegularExpressionField;
+import com.olivadevelop.kore.annotation.RegularExpressionOption;
 import com.olivadevelop.kore.annotation.RenderIgnoreView;
 import com.olivadevelop.kore.component.ComponentProperty;
 import com.olivadevelop.kore.component.KoreComponentView;
@@ -166,11 +168,19 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                     component.setImmediateValidation(a.immediateValidation());
                     component.setRegexPattern(a.value());
                 });
+                setComponentAttributes(component);
                 getComponentViewMap().put(id, component);
             }
         } catch (Throwable e) {
             Log.e(Constants.Log.TAG, "Error al crear el componente '" + id + "' ('" + cp.getComponentClass() + "') del viewmodel. " + e.getMessage());
         }
+    }
+    private void setComponentAttributes(KoreComponentView<?> component) {
+        ComponentProperty cp = component.getComponentProperty();
+        List<RegularExpressionOption> options = new ArrayList<>();
+        cp.getAnnotations().stream().filter(a -> a instanceof RegularExpressionField).map(a -> (RegularExpressionField) a).flatMap(opt -> Arrays.stream(opt.options())).forEach(options::add);
+        cp.getAnnotations().stream().filter(a -> a instanceof CustomViewRender).map(a -> (CustomViewRender) a).flatMap(opt -> Arrays.stream(opt.options())).forEach(options::add);
+        if (!options.isEmpty()) { options.forEach(opt -> component.getAttributes().set(opt.attribute(), opt.value())); }
     }
     private String buildHint(String id) {
         return Utils.translateStringIdFromResourceStrings(getCtx(), Constants.UI.LABEL_FORM + id, StringUtils.capitalize(id));

@@ -21,11 +21,12 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.olivadevelop.kore.R;
 import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.annotation.RegularExpressionField;
+import com.olivadevelop.kore.annotation.RegularExpressionOption;
+import com.olivadevelop.kore.component.attribute.KoreAttributes;
 import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
 import com.olivadevelop.kore.preferences.PreferenceField;
 import com.olivadevelop.kore.preferences.PreferencesHelper;
 import com.olivadevelop.kore.util.AutoCalculateFormulaData;
-import com.olivadevelop.kore.component.attribute.KoreAttributes;
 import com.olivadevelop.kore.util.Utils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -85,13 +86,17 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
 
     private final KoreAttributes attributes = new KoreAttributes();
 
+    public KoreComponentView(Context context, List<RegularExpressionOption> options) {
+        this(context, (AttributeSet) null);
+        processAttrsFromOptions(options);
+    }
     public KoreComponentView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.koreActivity = context instanceof KoreActivity<?, ?> ? (KoreActivity<?, ?>) context : null;
         if (this.koreActivity == null) { this.activity = context instanceof Activity ? (Activity) context : null; }
         this.binding = Utils.Reflex.initBinding(this);
-        setDisabled(false);
         this.disabledOverlayBinding = getDisabledOverlayBinding();
+        setDisabled(false);
         setupValidation(editTextToValidate());
         init(context, attrs);
         setOnFocusChangeListener((v, hasFocus) -> { if (hasFocus) { this.koreActivity.scrollTo(0, v.getBottom()); } });
@@ -263,6 +268,11 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         configureFromLayout(cb.build());
         a.recycle();
     }
+    private void processAttrsFromOptions(List<RegularExpressionOption> options) {
+        ComponentAttributes cb = ComponentAttributes.builder().build();
+        options.forEach(opt -> Utils.Reflex.fillProperty(cb, opt.attribute().getXmlName(), opt.value()));
+        configureFromLayout(cb);
+    }
     protected void updatePreferences(Object value) { PreferencesHelper.getInstance().add(getPreferenceKey(), value); }
     public void setMandatory(boolean mandatory) {
         this.mandatory = mandatory;
@@ -294,6 +304,7 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     @Builder
     @ToString
     public static class ComponentAttributes {
+        //        private final Map<KoreComponentViewAttribute, Object> attributes = new HashMap<>();
         private final boolean enabled;
         private final boolean errorEnabled;
         private final boolean checked;
@@ -331,5 +342,7 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         private static float getFloat(AttributeSet attrs, String ns, String key, float def) {
             return attrs.getAttributeFloatValue(ns, key, def);
         }
+//        public Object getFromMap(KoreComponentViewAttribute attribute) { return attributes.get(attribute); }
+//        public void setToMap(KoreComponentViewAttribute attribute, Object value) { attributes.put(attribute, value); }
     }
 }

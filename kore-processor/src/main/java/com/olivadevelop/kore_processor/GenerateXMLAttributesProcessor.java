@@ -65,7 +65,7 @@ public class GenerateXMLAttributesProcessor extends AbstractProcessor {
     }
     private void generate(GenerateXMLAttributes cfg) {
         try {
-            Document document = loadXml(cfg.xmlPath());
+            Document document = loadXml(cfg.xmlProjectPath() + cfg.xmlPath());
             Element styleable = findStyleable(document, cfg.styleable());
             if (styleable == null) { return; }
             List<XmlAttrModel> attrs = parseAttributes(styleable);
@@ -76,8 +76,6 @@ public class GenerateXMLAttributesProcessor extends AbstractProcessor {
         }
     }
     private Document loadXml(String xmlPath) throws Exception {
-        xmlPath = "D:\\__Proyectos\\Android\\Kore\\kore-android-tester\\src\\main\\res\\values\\attrs.xml";
-//        Path projectDir = Paths.get(processingEnv.getOptions().getOrDefault("kapt.kotlin.generated", "")).getParent();
         Path projectDir = Paths.get("").toAbsolutePath();
         Path path = projectDir.resolve(xmlPath).normalize();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -188,15 +186,20 @@ public class GenerateXMLAttributesProcessor extends AbstractProcessor {
                     .append(attr.getName())
                     .append("\", ")
                     .append(attr.primaryType())
+                    .append(", \"")
+                    .append(cfg.styleable())
+                    .append("\"")
                     .append("),").append(Params.LINE_BREAK);
         }
         sb.append(";").append(Params.LINE_BREAK_DOUBLE);
-        sb.append("    private final String xmlName;").append(Params.LINE_BREAK);
-        sb.append("    private final KoreAttributeFormat type;").append(Params.LINE_BREAK);
+        sb.append("    private final String xmlName").append(Params.SEMICOLON).append(Params.LINE_BREAK);
+        sb.append("    private final ").append(KoreAttributeFormat.class.getSimpleName()).append(" type").append(Params.SEMICOLON).append(Params.LINE_BREAK);
+        sb.append("    private final String styleableName").append(Params.SEMICOLON).append(Params.LINE_BREAK);
         sb.append("    ").append(className)
-                .append("(String xmlName, KoreAttributeFormat type) {").append(Params.LINE_BREAK)
-                .append("        this.xmlName = xmlName;").append(Params.LINE_BREAK)
-                .append("        this.type = type;").append(Params.LINE_BREAK)
+                .append("(String xmlName, ").append(KoreAttributeFormat.class.getSimpleName()).append(" type, String styleableName) {").append(Params.LINE_BREAK)
+                .append("        this.xmlName = xmlName").append(Params.SEMICOLON).append(Params.LINE_BREAK)
+                .append("        this.type = type").append(Params.SEMICOLON).append(Params.LINE_BREAK)
+                .append("        this.styleableName = styleableName").append(Params.SEMICOLON).append(Params.LINE_BREAK)
                 .append("    }").append(Params.LINE_BREAK);
         sb.append("}").append(Params.LINE_BREAK);
         writeFile(cfg.targetPackage(), className, sb.toString());

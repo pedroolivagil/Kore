@@ -13,6 +13,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.provider.Settings;
@@ -26,6 +27,7 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.TextView;
 
@@ -46,6 +48,7 @@ import com.olivadevelop.kore.component.CustomEditNumberView;
 import com.olivadevelop.kore.component.CustomEditTextView;
 import com.olivadevelop.kore.component.CustomSwitchView;
 
+import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
 import java.io.File;
@@ -189,7 +192,7 @@ public abstract class Utils {
     public static String getDeviceName(Context ctx) {
         String name = Settings.Global.getString(ctx.getContentResolver(), DEVICE_NAME);
         if (name == null || name.isEmpty()) { name = Settings.Secure.getString(ctx.getContentResolver(), BLUETOOTH_NAME); }
-        if (name == null || name.isEmpty()) { name = android.os.Build.MODEL + " " + android.os.Build.MANUFACTURER; }
+        if (name == null || name.isEmpty()) { name = Build.MODEL + " " + Build.MANUFACTURER; }
         return name;
     }
     public static String getVersionName(Context ctx) {
@@ -371,7 +374,7 @@ public abstract class Utils {
             AnimatorSet set = new AnimatorSet();
             set.playTogether(scaleX, scaleY);
             set.setDuration(250);
-            set.setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator());
+            set.setInterpolator(new AccelerateDecelerateInterpolator());
             set.start();
         }
         public static void animateHorizontalSlide(TextView view, boolean toRight, String newText) {
@@ -504,6 +507,13 @@ public abstract class Utils {
             if (type instanceof Class<?>) { return new TypeDescriptor(null, List.of((Class<?>) type)); }
             return null;
         }
+        public static void fillProperty(Object target, String propertyName, Object value) {
+            try {
+                FieldUtils.writeDeclaredField(target, propertyName, value, true);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
         public Class<?> getInnermostType(TypeDescriptor td) { return td.getArguments().isEmpty() ? null : td.getArguments().get(td.getArguments().size() - 1); }
         public static <T extends ViewBinding> T initBinding(Activity ctx) { return initBinding(ctx, 0); }
         public static <T extends ViewBinding> T initBinding(Activity ctx, int indexParam) {
@@ -567,7 +577,7 @@ public abstract class Utils {
                     Class<?> targetType = entry.getKey();
                     Optional<? extends CustomViewRender> optCvr =
                             entry.getValue().stream().filter(a -> a instanceof CustomViewRender).map(a -> (CustomViewRender) a).findFirst();
-                    if (optCvr.isPresent()) { targetType = optCvr.get().converTo(); }
+                    if (optCvr.isPresent()) { targetType = optCvr.get().convertTo(); }
                     Function<String, ?> converter = componentConverters.get(targetType);
                     return Optional.ofNullable((V) (converter != null ? converter.apply(value.trim()) : null));
                 }
@@ -728,5 +738,19 @@ public abstract class Utils {
                 b.putLong(key, (Long) value);
             } else if (value instanceof Float) { b.putFloat(key, (Float) value); }
         }
+    }
+
+    public static class References {
+        public static int resolveStyleable(Context context, String styleableName, String attrName) {
+            try {
+                Class<?> styleable = Class.forName(context.getPackageName() + ".R$styleable");
+                int[] styleableArray = (int[]) styleable.getField(styleableName).get(null);
+                int index = styleable.getField(styleableName + "_" + attrName).getInt(null);
+                return styleableArray != null ? styleableArray[index] : 0;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
     }
 }
