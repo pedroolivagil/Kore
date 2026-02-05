@@ -150,7 +150,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         Class<? extends View> classComponent = Utils.Reflex.getViewFromTypeClass(cp.getComponentClass(), cp.getAnnotations());
         String id = cp.getProperty();
         try {
-            View view = classComponent.getDeclaredConstructor(Context.class, AttributeSet.class).newInstance(getCtx(), null);
+            View view = classComponent.getDeclaredConstructor(Context.class, AttributeSet.class).newInstance(getCtx(), getComponentAttributes(cp));
             if (view instanceof KoreComponentView) {
                 KoreComponentView<?> component = (KoreComponentView<?>) view;
                 component.setComponentProperty(cp);
@@ -168,19 +168,17 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
                     component.setImmediateValidation(a.immediateValidation());
                     component.setRegexPattern(a.value());
                 });
-                setComponentAttributes(component);
                 getComponentViewMap().put(id, component);
             }
         } catch (Throwable e) {
             Log.e(Constants.Log.TAG, "Error al crear el componente '" + id + "' ('" + cp.getComponentClass() + "') del viewmodel. " + e.getMessage());
         }
     }
-    private void setComponentAttributes(KoreComponentView<?> component) {
-        ComponentProperty cp = component.getComponentProperty();
+    private List<RegularExpressionOption> getComponentAttributes(ComponentProperty cp) {
         List<RegularExpressionOption> options = new ArrayList<>();
         cp.getAnnotations().stream().filter(a -> a instanceof RegularExpressionField).map(a -> (RegularExpressionField) a).flatMap(opt -> Arrays.stream(opt.options())).forEach(options::add);
         cp.getAnnotations().stream().filter(a -> a instanceof CustomViewRender).map(a -> (CustomViewRender) a).flatMap(opt -> Arrays.stream(opt.options())).forEach(options::add);
-        if (!options.isEmpty()) { options.forEach(opt -> component.getAttributes().set(opt.attribute(), opt.value())); }
+        return options;
     }
     private String buildHint(String id) {
         return Utils.translateStringIdFromResourceStrings(getCtx(), Constants.UI.LABEL_FORM + id, StringUtils.capitalize(id));

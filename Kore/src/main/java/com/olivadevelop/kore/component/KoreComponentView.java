@@ -270,7 +270,10 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     }
     private void processAttrsFromOptions(List<RegularExpressionOption> options) {
         ComponentAttributes cb = ComponentAttributes.builder().build();
-        options.forEach(opt -> Utils.Reflex.fillProperty(cb, opt.attribute().getXmlName(), opt.value()));
+        options.forEach(opt -> {
+            Utils.Reflex.fillProperty(cb, opt.attribute().getXmlName(), opt.value());
+            getAttributes().set(opt.attribute(), opt.value());
+        });
         configureFromLayout(cb);
     }
     protected void updatePreferences(Object value) { PreferencesHelper.getInstance().add(getPreferenceKey(), value); }
