@@ -12,6 +12,13 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments.put("kore.version", "$version")
+                arguments.put("kore.projectDir", project.projectDir.path)
+            }
+        }
     }
 
     buildTypes {
@@ -53,7 +60,7 @@ dependencies {
     implementation(libs.activity)
     implementation(libs.colorpickerview)
     implementation(libs.recyclerview)
-    implementation(libs.legacy.support.v4)
+//    implementation(libs.legacy.support.v4)
     implementation(project(":kore-annotations"))
     annotationProcessor(project(":kore-processor"))
     compileOnly(libs.lombok)
@@ -75,6 +82,9 @@ dependencies {
 tasks.withType<JavaCompile>().configureEach {
     options.compilerArgs.add(
         "-Akore.version=$version"
+    )
+    options.compilerArgs.add(
+        "-Akore.projectDir="+project.projectDir.absolutePath
     )
 }
 

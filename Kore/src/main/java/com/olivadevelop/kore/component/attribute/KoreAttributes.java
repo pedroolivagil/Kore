@@ -5,7 +5,7 @@ import com.olivadevelop.kore_annotations.GenerateXMLAttributes;
 
 import java.util.EnumMap;
 
-@GenerateXMLAttributes(styleable = "KoreComponentView", xmlProjectPath = "D:\\__Proyectos\\Android\\Kore\\Kore")
+@GenerateXMLAttributes(styleable = "KoreComponentView")
 public class KoreAttributes {
     private final EnumMap<KoreComponentViewAttribute, Object> values = new EnumMap<>(KoreComponentViewAttribute.class);
 

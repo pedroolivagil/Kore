@@ -3,11 +3,11 @@ package com.olivadevelop.kore_processor;
 import static org.apache.commons.lang3.StringUtils.capitalize;
 
 import com.google.auto.service.AutoService;
+import com.olivadevelop.kore_annotations.GenerateXMLAttributes;
+import com.olivadevelop.kore_processor.attributes.AttributeFormat;
 import com.olivadevelop.kore_processor.attributes.XmlAttrModel;
 import com.olivadevelop.kore_processor.attributes.XmlEnumModel;
 import com.olivadevelop.kore_processor.attributes.XmlEnumValue;
-import com.olivadevelop.kore_processor.attributes.AttributeFormat;
-import com.olivadevelop.kore_annotations.GenerateXMLAttributes;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -15,12 +15,14 @@ import org.w3c.dom.NodeList;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -32,6 +34,7 @@ import javax.annotation.processing.SupportedOptions;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.TypeElement;
+import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,13 +45,20 @@ import javax.xml.parsers.DocumentBuilderFactory;
 public class GenerateXMLAttributesProcessor extends AbstractProcessor {
     private Filer filer;
     private String koreVersion;
+    private String koreProjectDir;
 
     @Override
     public synchronized void init(ProcessingEnvironment env) {
         super.init(env);
         filer = env.getFiler();
-        koreVersion = env.getOptions().get("kore.version");
+        Map<String, String> options = env.getOptions();
+        koreVersion = options.get("kore.version");
+        koreProjectDir = options.get("kore.projectDir");
         if (koreVersion == null) { koreVersion = "unknown"; }
+        if (koreProjectDir == null) {
+            processingEnv.getMessager()
+                    .printMessage(Diagnostic.Kind.ERROR, "kore.projectDir not provided. Configure annotationProcessorOptions in Gradle.");
+        }
     }
     @Override
     public Set<String> getSupportedAnnotationTypes() {
@@ -65,7 +75,7 @@ public class GenerateXMLAttributesProcessor extends AbstractProcessor {
     }
     private void generate(GenerateXMLAttributes cfg) {
         try {
-            Document document = loadXml(cfg.xmlProjectPath() + cfg.xmlPath());
+            Document document = loadXml(cfg.xmlPath());
             Element styleable = findStyleable(document, cfg.styleable());
             if (styleable == null) { return; }
             List<XmlAttrModel> attrs = parseAttributes(styleable);
@@ -76,8 +86,9 @@ public class GenerateXMLAttributesProcessor extends AbstractProcessor {
         }
     }
     private Document loadXml(String xmlPath) throws Exception {
-        Path projectDir = Paths.get("").toAbsolutePath();
+        Path projectDir = Paths.get(koreProjectDir);
         Path path = projectDir.resolve(xmlPath).normalize();
+        if (!Files.exists(path)) { processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "attrs.xml not found at: " + path); }
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setIgnoringComments(true);
         factory.setIgnoringElementContentWhitespace(true);
@@ -119,7 +130,7 @@ public class GenerateXMLAttributesProcessor extends AbstractProcessor {
         NodeList enums = attr.getElementsByTagName("enum");
         for (int i = 0; i < enums.getLength(); i++) {
             Element e = (Element) enums.item(i);
-            model.getValues().add(new XmlEnumValue(                    e.getAttribute("name"),                    Integer.parseInt(e.getAttribute("value"))            ));
+            model.getValues().add(new XmlEnumValue(e.getAttribute("name"), Integer.parseInt(e.getAttribute("value"))));
         }
         return model;
     }

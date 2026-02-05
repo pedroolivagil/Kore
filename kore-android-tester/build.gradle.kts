@@ -14,6 +14,13 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments.put("kore.version", "$version")
+                arguments.put("kore.projectDir", project.projectDir.path)
+            }
+        }
     }
 
     buildTypes {
