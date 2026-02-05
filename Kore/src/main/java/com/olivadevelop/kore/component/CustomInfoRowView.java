@@ -7,10 +7,14 @@ import androidx.annotation.Dimension;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.olivadevelop.kore.annotation.RegularExpressionOption;
 import com.olivadevelop.kore.databinding.CompInfoRowBinding;
+
+import java.util.List;
 
 public class CustomInfoRowView extends KoreComponentView<CompInfoRowBinding> {
 
+    public CustomInfoRowView(Context context, List<RegularExpressionOption> options) { super(context, options); }
     public CustomInfoRowView(Context context, @Nullable AttributeSet attrs) { super(context, attrs); }
 
     @Override

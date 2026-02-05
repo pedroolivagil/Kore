@@ -13,11 +13,13 @@ import androidx.annotation.Nullable;
 
 import com.olivadevelop.kore.Constants;
 import com.olivadevelop.kore.R;
+import com.olivadevelop.kore.annotation.RegularExpressionOption;
 import com.olivadevelop.kore.databinding.CompCustomImageSelectorBinding;
 import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
 import com.olivadevelop.kore.media.CameraGalleryImageManager;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +30,7 @@ public class CustomImageSelector extends KoreComponentView<CompCustomImageSelect
     @Setter
     private int maxImages;
 
+    public CustomImageSelector(Context context, List<RegularExpressionOption> options) { super(context, options); }
     public CustomImageSelector(Context context, @Nullable AttributeSet attrs) { super(context, attrs); }
 
     @Override

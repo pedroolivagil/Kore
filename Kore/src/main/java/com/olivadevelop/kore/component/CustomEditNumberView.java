@@ -13,13 +13,16 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.olivadevelop.kore.R;
+import com.olivadevelop.kore.annotation.RegularExpressionOption;
 import com.olivadevelop.kore.databinding.CompCustomEditTextBinding;
 import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class CustomEditNumberView extends KoreComponentView<CompCustomEditTextBinding> {
+import java.util.List;
 
+public class CustomEditNumberView extends KoreComponentView<CompCustomEditTextBinding> {
+    public CustomEditNumberView(Context context, List<RegularExpressionOption> options) { super(context, options); }
     public CustomEditNumberView(Context context, @Nullable AttributeSet attrs) { super(context, attrs); }
     @Override
     protected void configureFromLayout(@NonNull ComponentAttributes c) {

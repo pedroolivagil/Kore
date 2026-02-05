@@ -7,11 +7,15 @@ import androidx.annotation.Dimension;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.olivadevelop.kore.annotation.RegularExpressionOption;
 import com.olivadevelop.kore.databinding.CompCustomSwitchBinding;
 import com.olivadevelop.kore.preferences.PreferencesHelper;
 
+import java.util.List;
+
 public class CustomSwitchView extends KoreComponentView<CompCustomSwitchBinding> {
 
+    public CustomSwitchView(Context context, List<RegularExpressionOption> options) { super(context, options); }
     public CustomSwitchView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         getBinding().getRoot().setOnClickListener(v -> getBinding().toggleButton.performClick());

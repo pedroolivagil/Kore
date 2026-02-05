@@ -22,6 +22,7 @@ import androidx.transition.TransitionManager;
 
 import com.olivadevelop.kore.Constants;
 import com.olivadevelop.kore.R;
+import com.olivadevelop.kore.annotation.RegularExpressionOption;
 import com.olivadevelop.kore.databinding.CompCustomColorSelectorBinding;
 import com.olivadevelop.kore.databinding.DisabledOverlayBinding;
 import com.olivadevelop.kore.media.CameraGalleryImageManager;
@@ -31,6 +32,7 @@ import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener;
 import com.skydoves.colorpickerview.sliders.BrightnessSlideBar;
 
 import java.io.FileNotFoundException;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -43,6 +45,7 @@ public class CustomColorPickerView extends KoreComponentView<CompCustomColorSele
     private final Integer maxImages = 1;
     private static final Bitmap bitmap = Bitmap.createBitmap(200, 200, Bitmap.Config.ARGB_8888);
 
+    public CustomColorPickerView(Context context, List<RegularExpressionOption> options) { super(context, options); }
     public CustomColorPickerView(Context context, @Nullable AttributeSet attrs) { super(context, attrs); }
     @Override
     @SuppressLint("ClickableViewAccessibility")

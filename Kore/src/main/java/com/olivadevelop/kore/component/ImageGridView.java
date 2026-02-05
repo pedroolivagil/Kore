@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.olivadevelop.kore.adapter.ImageGridAdapter;
+import com.olivadevelop.kore.annotation.RegularExpressionOption;
 import com.olivadevelop.kore.databinding.ViewImageGridBinding;
 
 import java.util.List;
@@ -24,7 +25,14 @@ public class ImageGridView extends KoreComponentView<ViewImageGridBinding> {
     private final ImageGridAdapter adapter;
     private int spanCount;
     private int maxImages;
-
+    public ImageGridView(Context context, List<RegularExpressionOption> options) {
+        super(context, options);
+        this.recyclerView = getBinding().recycler;
+        this.selector = getBinding().selector;
+        this.selector.setMaxImages(this.maxImages);
+        this.recyclerView.setLayoutManager(new GridLayoutManager(context, getSpanCount()));
+        this.adapter = new ImageGridAdapter();
+    }
     public ImageGridView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         this.recyclerView = getBinding().recycler;
