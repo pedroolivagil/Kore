@@ -150,7 +150,7 @@ public abstract class KoreViewModel<T extends KoreDTO<? extends KoreEntity>> ext
         Class<? extends View> classComponent = Utils.Reflex.getViewFromTypeClass(cp.getComponentClass(), cp.getAnnotations());
         String id = cp.getProperty();
         try {
-            View view = classComponent.getDeclaredConstructor(Context.class, AttributeSet.class).newInstance(getCtx(), getComponentAttributes(cp));
+            View view = classComponent.getDeclaredConstructor(Context.class, List.class).newInstance(getCtx(), getComponentAttributes(cp));
             if (view instanceof KoreComponentView) {
                 KoreComponentView<?> component = (KoreComponentView<?>) view;
                 component.setComponentProperty(cp);
