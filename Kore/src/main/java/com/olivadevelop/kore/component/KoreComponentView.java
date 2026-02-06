@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat;
 import androidx.viewbinding.ViewBinding;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.olivadevelop.kore.ComponentAttributesStatic;
 import com.olivadevelop.kore.R;
 import com.olivadevelop.kore.activity.KoreActivity;
 import com.olivadevelop.kore.annotation.RegularExpressionField;
@@ -28,6 +29,7 @@ import com.olivadevelop.kore.preferences.PreferenceField;
 import com.olivadevelop.kore.preferences.PreferencesHelper;
 import com.olivadevelop.kore.util.AutoCalculateFormulaData;
 import com.olivadevelop.kore.util.Utils;
+import com.olivadevelop.kore_annotations.StaticProperties;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -35,6 +37,7 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -232,7 +235,8 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         }
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.KoreComponentView);
         ComponentAttributes.ComponentAttributesBuilder cb =
-                ComponentAttributes.builder().checked(a.getBoolean(R.styleable.KoreComponentView_checked, false))
+                ComponentAttributes.builder()
+                        .checked(a.getBoolean(R.styleable.KoreComponentView_checked, false))
                         .enabled(a.getBoolean(R.styleable.KoreComponentView_enabled, true))
                         .preferenceKey(a.getString(R.styleable.KoreComponentView_preferenceKey))
                         .preferenceType(a.getInt(R.styleable.KoreComponentView_preferenceType, -1))
@@ -269,11 +273,8 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         a.recycle();
     }
     private void processAttrsFromOptions(List<RegularExpressionOption> options) {
-        ComponentAttributes cb = ComponentAttributes.builder().build();
-        options.forEach(opt -> {
-            Utils.Reflex.fillProperty(cb, opt.attribute().getXmlName(), opt.value());
-            getAttributes().set(opt.attribute(), opt.value());
-        });
+        ComponentAttributes cb = new ComponentAttributes(getContext(), options);
+        options.forEach(opt -> getAttributes().set(opt.attribute(), opt.value()));
         configureFromLayout(cb);
     }
     protected void updatePreferences(Object value) { PreferencesHelper.getInstance().add(getPreferenceKey(), value); }
@@ -306,8 +307,8 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
     @Getter
     @Builder
     @ToString
+    @StaticProperties
     public static class ComponentAttributes {
-        //        private final Map<KoreComponentViewAttribute, Object> attributes = new HashMap<>();
         private final boolean enabled;
         private final boolean errorEnabled;
         private final boolean checked;
@@ -331,10 +332,75 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         private final int startIconTint;
         private final int spanCount;
         private final int maxImages;
-        @Builder.Default
-        private final boolean mandatory = false;
-        @Builder.Default
-        private final String valuePropertyProcessed = null;
+        private final boolean mandatory;
+        private final String valuePropertyProcessed;
+        public ComponentAttributes(boolean enabled, boolean errorEnabled, boolean checked, String preferenceKey, int preferenceType, String title,
+                String hintText, int borderColor, int boxStrokeColor, int textColor, int hintTextColor, float textSize, int textStyle, String subtitle,
+                String value, int valueTextColor, float valueTextSize, int valueTextStyle, String valueProperties, int startIconDrawable, int startIconTint,
+                int spanCount, int maxImages, boolean mandatory, String valuePropertyProcessed) {
+            this.enabled = enabled;
+            this.errorEnabled = errorEnabled;
+            this.checked = checked;
+            this.preferenceKey = preferenceKey;
+            this.preferenceType = preferenceType;
+            this.title = title;
+            this.hintText = hintText;
+            this.borderColor = borderColor;
+            this.boxStrokeColor = boxStrokeColor;
+            this.textColor = textColor;
+            this.hintTextColor = hintTextColor;
+            this.textSize = textSize;
+            this.textStyle = textStyle;
+            this.subtitle = subtitle;
+            this.value = value;
+            this.valueTextColor = valueTextColor;
+            this.valueTextSize = valueTextSize;
+            this.valueTextStyle = valueTextStyle;
+            this.valueProperties = valueProperties;
+            this.startIconDrawable = startIconDrawable;
+            this.startIconTint = startIconTint;
+            this.spanCount = spanCount;
+            this.maxImages = maxImages;
+            this.mandatory = mandatory;
+            this.valuePropertyProcessed = valuePropertyProcessed;
+        }
+        public ComponentAttributes(@NonNull Context ctx, @NonNull List<RegularExpressionOption> options) {
+            int defaultTextStyle = 0;
+            float defaultTextSize = 16f;
+            int defaultTextColor = ctx.getResources().getColor(R.color.text_primary, ctx.getTheme());
+            int defaultBorderColor = ctx.getResources().getColor(R.color.gray, ctx.getTheme());
+            int defaultBoxStrokeColor = ctx.getResources().getColor(R.color.gray, ctx.getTheme());
+            this.enabled = getFromList(options, ComponentAttributesStatic.enabled, true);
+            this.errorEnabled = getFromList(options, ComponentAttributesStatic.errorEnabled, false);
+            this.checked = getFromList(options, ComponentAttributesStatic.checked, false);
+            this.preferenceKey = getFromList(options, ComponentAttributesStatic.preferenceKey, (String) null);
+            this.preferenceType = getFromList(options, ComponentAttributesStatic.preferenceType, -1);
+            this.title = getFromList(options, ComponentAttributesStatic.title, (String) null);
+            this.hintText = getFromList(options, ComponentAttributesStatic.hintText, (String) null);
+            this.borderColor = getFromList(options, ComponentAttributesStatic.borderColor, defaultBorderColor);
+            this.boxStrokeColor = getFromList(options, ComponentAttributesStatic.boxStrokeColor, defaultBoxStrokeColor);
+            this.textColor = getFromList(options, ComponentAttributesStatic.textColor, defaultTextColor);
+            this.hintTextColor = getFromList(options, ComponentAttributesStatic.hintTextColor, defaultTextColor);
+            this.textSize = getFromList(options, ComponentAttributesStatic.textSize, defaultTextSize);
+            this.textStyle = getFromList(options, ComponentAttributesStatic.textStyle, defaultTextStyle);
+            this.subtitle = getFromList(options, ComponentAttributesStatic.subtitle, (String) null);
+            this.value = getFromList(options, ComponentAttributesStatic.value, (String) null);
+            this.valueTextColor = getFromList(options, ComponentAttributesStatic.valueTextColor, defaultTextColor);
+            this.valueTextSize = getFromList(options, ComponentAttributesStatic.valueTextSize, defaultTextSize);
+            this.valueTextStyle = getFromList(options, ComponentAttributesStatic.valueTextStyle, defaultTextStyle);
+            this.valueProperties = getFromList(options, ComponentAttributesStatic.valueProperties, (String) null);
+            this.startIconDrawable = getFromList(options, ComponentAttributesStatic.startIconDrawable, -1);
+            this.startIconTint = getFromList(options, ComponentAttributesStatic.startIconTint, -1);
+            this.spanCount = getFromList(options, ComponentAttributesStatic.spanCount, 3);
+            this.maxImages = getFromList(options, ComponentAttributesStatic.maxImages, 1);
+            this.mandatory = getFromList(options, ComponentAttributesStatic.mandatory, false);
+            this.valuePropertyProcessed = null;
+        }
+        private <T> T getFromList(List<RegularExpressionOption> options, String property, T defaultValue) {
+            Optional<RegularExpressionOption> opt = options.stream().filter(o -> o.attribute().getXmlName().equals(property)).findFirst();
+            if (opt.isPresent()) { return (T) opt.get().value(); }
+            return defaultValue;
+        }
         private static boolean getBoolean(AttributeSet attrs, String ns, String key, boolean def) {
             String raw = attrs.getAttributeValue(ns, key);
             return raw == null ? def : Boolean.parseBoolean(raw);
@@ -345,7 +411,5 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         private static float getFloat(AttributeSet attrs, String ns, String key, float def) {
             return attrs.getAttributeFloatValue(ns, key, def);
         }
-//        public Object getFromMap(KoreComponentViewAttribute attribute) { return attributes.get(attribute); }
-//        public void setToMap(KoreComponentViewAttribute attribute, Object value) { attributes.put(attribute, value); }
     }
 }
