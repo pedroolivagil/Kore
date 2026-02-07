@@ -220,7 +220,7 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
                     .mandatory(ComponentAttributes.getBoolean(attrs, namespace, "mandatory", false))
                     .errorEnabled(ComponentAttributes.getBoolean(attrs, namespace, "errorEnabled", false))
                     .hintTextColor(ComponentAttributes.getInt(attrs, namespace, "hintTextColor", defaultTextColor))
-                    .boxStrokeColor(ComponentAttributes.getInt(attrs, namespace, "borderColor", defaultBoxStrokeColor))
+                    .boxStrokeColor(ComponentAttributes.getInt(attrs, namespace, "boxStrokeColor", defaultBoxStrokeColor))
                     .startIconDrawable(attrs.getAttributeResourceValue(namespace, "startIconDrawable", -1))
                     .startIconTint(ComponentAttributes.getInt(attrs, namespace, "startIconTint", -1))
                     .spanCount(ComponentAttributes.getInt(attrs, namespace, "spanCount", 3))
@@ -254,13 +254,13 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
                         .mandatory(a.getBoolean(R.styleable.KoreComponentView_mandatory, false))
                         .errorEnabled(a.getBoolean(R.styleable.KoreComponentView_errorEnabled, false))
                         .hintTextColor(a.getColor(R.styleable.KoreComponentView_hintTextColor, defaultTextColor))
-                        .boxStrokeColor(a.getColor(R.styleable.KoreComponentView_borderColor, defaultBoxStrokeColor))
+                        .boxStrokeColor(a.getColor(R.styleable.KoreComponentView_boxStrokeColor, defaultBoxStrokeColor))
                         .startIconDrawable(a.getResourceId(R.styleable.KoreComponentView_startIconDrawable, -1))
                         .startIconTint(a.getColor(R.styleable.KoreComponentView_startIconTint, -1))
                         .hintText(a.getString(R.styleable.KoreComponentView_hintText))
                         .spanCount(a.getInt(R.styleable.KoreComponentView_spanCount, 3))
                         .maxImages(a.getInt(R.styleable.KoreComponentView_maxImages, 1));
-        if (cb.valueProperties != null && !cb.valueProperties.isEmpty()) {
+        if (cb.valueProperties != null && !cb.valueProperties.isEmpty() && cb.value != null) {
             String[] properties = cb.valueProperties.split(";");
             if (cb.value.contains("%s") && properties.length > 0) {
                 cb.valuePropertyProcessed(Utils.Reflex.processAllValueProperties(getKoreActivity(), properties));
@@ -398,7 +398,10 @@ public abstract class KoreComponentView<T extends ViewBinding> extends LinearLay
         }
         private <T> T getFromList(List<RegularExpressionOption> options, String property, T defaultValue) {
             Optional<RegularExpressionOption> opt = options.stream().filter(o -> o.attribute().getXmlName().equals(property)).findFirst();
-            if (opt.isPresent()) { return (T) opt.get().value(); }
+            if (opt.isPresent()) {
+                RegularExpressionOption reo = opt.get();
+                return (T) Utils.Reflex.castValue(reo.value(), defaultValue.getClass()).orElse(defaultValue);
+            }
             return defaultValue;
         }
         private static boolean getBoolean(AttributeSet attrs, String ns, String key, boolean def) {

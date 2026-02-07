@@ -578,13 +578,16 @@ public abstract class Utils {
                     Optional<? extends CustomViewRender> optCvr =
                             entry.getValue().stream().filter(a -> a instanceof CustomViewRender).map(a -> (CustomViewRender) a).findFirst();
                     if (optCvr.isPresent()) { targetType = optCvr.get().convertTo(); }
-                    Function<String, ?> converter = componentConverters.get(targetType);
-                    return Optional.ofNullable((V) (converter != null ? converter.apply(value.trim()) : null));
+                    return castValue(value, targetType);
                 }
                 return result;
             } catch (Exception e) {
                 return result;
             }
+        }
+        public static <V> @NonNull Optional<V> castValue(String value, Class<?> targetType) {
+            Function<String, ?> converter = componentConverters.get(targetType);
+            return Optional.ofNullable((V) (converter != null ? converter.apply(value.trim()) : null));
         }
         public static String processAllValueProperties(Activity a, String[] rawProperties) {
             List<String> results = new ArrayList<>();
