@@ -32,6 +32,7 @@ public class ImageGridView extends KoreComponentView<ViewImageGridBinding> {
         this.selector.setMaxImages(this.maxImages);
         this.recyclerView.setLayoutManager(new GridLayoutManager(context, getSpanCount()));
         this.adapter = new ImageGridAdapter();
+        _init();
     }
     public ImageGridView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -40,6 +41,9 @@ public class ImageGridView extends KoreComponentView<ViewImageGridBinding> {
         this.selector.setMaxImages(this.maxImages);
         this.recyclerView.setLayoutManager(new GridLayoutManager(context, getSpanCount()));
         this.adapter = new ImageGridAdapter();
+        _init();
+    }
+    private void _init() {
         this.recyclerView.setAdapter(adapter);
         OnValueChange ovc = getBinding().selector.getOnValueChange();
         getBinding().selector.setOnValueChange(s -> {
